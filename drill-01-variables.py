@@ -369,15 +369,20 @@ for u in users:
 
 # 58. For each student, print their grades joined with " | ".
 #     Syntax: " | ".join(str(g) for g in grades)   ← just follow the pattern for now
-
-
+for s in students:
+    grades = s["grades"]
+    print(" | ".join(str(g) for g in grades))
 # 59. Print the repr() of the string "hello\nworld".
 #     Syntax: repr(x)  — shows escape characters literally instead of interpreting them
-
+x = "hello\nworld"
+print(repr(x))
 
 # 60. Print users[0]["name"] in title case, lower case, and upper case.
 #     Syntax: str.title()  str.lower()  str.upper()
-
+name = users[0]["name"]
+print(str.title(name))
+print(str.lower(name))
+print(str.upper(name))
 
 # =============================================================================
 # SECTION E — NONE & TRUTHINESS (61–75)
