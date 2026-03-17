@@ -390,41 +390,67 @@ print(str.upper(name))
 
 # 61. Create a variable `result` = None. Check if it is None using `is None`. Print result.
 #     Syntax: x is None   (use `is` not == for None checks)
-
+result = None
+print(result is None)
 
 # 62. Create `result` = 0. Check if it is None. Print result.
-
+result = 0
+print(result is None)
 
 # 63. Print which of these are "truthy" and which are "falsy":
 #     0, 1, "", "hello", None, [], [1], False, True
 #     Use bool() on each.
-
+x = [0, 1, "", "hello", None, [], [1], False, True]
+for i in x:
+    print(bool(i))
 
 # 64. For each user, print their name only if isActive is truthy.
 #     Syntax: if user["isActive"]:   (no == True needed)
-
+for user in users:
+    if user["isActive"]:
+        print(user["name"])
 
 # 65. For each product, print its name only if inStock is falsy.
 #     Syntax: if not product["inStock"]:
-
+for product in products:
+    if not product["inStock"]:
+        print(product["name"])
 
 # 66. Create a variable `data` = None.
 #     Print "No data" if it is None, else print the data.
-
+data = None
+if data is None:
+    print("No Data")
+else:
+    print(data)
 
 # 67. Print how many users have a "truthy" isActive value.
 #     Count using a for loop.
-
-
+count = 0
+for u in users:
+    if u["isActive"]:
+        count += 1
+print(count)
 # 68. Print how many products have a "falsy" inStock value.
-
-
+count = 0
+for p in products:
+    if not p["inStock"]:
+        count += 1
+print(count)
 # 69. Create a variable `discount` = 0.
 #     Print "No discount" if discount is falsy, else print the discount.
-
-
+discount = 0
+if not discount:
+    print("No discount")
+else:
+    print(discount)
 # 70. For each order, print "High value" if total > 200, else print "Normal".
-
+for o in orders:
+    total = o["total"]
+    if total > 200:
+        print("High value")
+    else:
+        print("Normal")
 
 # =============================================================================
 # SECTION F — MULTIPLE ASSIGNMENT & SWAP (71–85)
@@ -434,23 +460,44 @@ print(str.upper(name))
 #     id, name, age, role, salary, is_active = users[0].values()
 #     Print each.
 #     Syntax: a, b, c = iterable   (must match count exactly)
-
+id, name, age, role, salary, is_active = users[0].values()
+print(id)
+print(name)
+print(age)
+print(role)
+print(salary)
+print(is_active)
 
 # 72. Unpack the first 3 numbers from `numbers` into a, b, c. Print them.
-
+a, b, c, *rest = numbers
+print(a)
+print(b)
+print(c)
 
 # 73. Unpack with a "rest" collector — get first number, last number, rest in middle.
 #     Syntax: first, *middle, last = numbers
 #     Print first, last, and middle.
+a, *rest, b = numbers
+print(a)
+print(rest)
+print(b)
 
 
 # 74. Get just the first two users unpacked, collect the rest.
 #     Syntax: u1, u2, *rest = users
-
+u1, u2, *rest = users
+print(u1)
+print(u2)
 
 # 75. Swap the price of products[0] and products[1] using tuple swap.
 #     Print both prices before and after.
-
+p1 = products[0]["price"]
+p2 = products[1]["price"]
+print(p1)
+print(p2)
+p1 = p2
+print(p1)
+print(p2)
 
 # 76. Unpack a student's grades into exactly 5 variables. Print each.
 #     Pick students[0] which has 5 grades.
