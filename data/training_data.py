@@ -1,0 +1,45 @@
+numbers = [4, 8, 15, 16, 23, 42, 7, 3, 19, 11]
+
+users = [
+    {"id": 1, "name": "Alice",   "age": 32, "role": "admin",     "salary": 72000, "isActive": True},
+    {"id": 2, "name": "Bob",     "age": 24, "role": "user",      "salary": 38000, "isActive": False},
+    {"id": 3, "name": "Carol",   "age": 29, "role": "moderator", "salary": 51000, "isActive": True},
+    {"id": 4, "name": "David",   "age": 41, "role": "admin",     "salary": 95000, "isActive": True},
+    {"id": 5, "name": "Eve",     "age": 26, "role": "user",      "salary": 43000, "isActive": False},
+    {"id": 6, "name": "Frank",   "age": 35, "role": "user",      "salary": 49000, "isActive": True},
+    {"id": 7, "name": "Grace",   "age": 22, "role": "moderator", "salary": 56000, "isActive": True},
+    {"id": 8, "name": "Hank",    "age": 38, "role": "user",      "salary": 34000, "isActive": False},
+]
+
+products = [
+    {"id": 1, "name": "Iron Sword",    "price": 120,  "category": "weapon", "inStock": True,  "quantity": 5},
+    {"id": 2, "name": "Steel Shield",  "price": 85,   "category": "armor",  "inStock": True,  "quantity": 8},
+    {"id": 3, "name": "Health Potion", "price": 25,   "category": "potion", "inStock": True,  "quantity": 50},
+    {"id": 4, "name": "Dragon Bow",    "price": 200,  "category": "weapon", "inStock": False, "quantity": 0},
+    {"id": 5, "name": "Leather Armor", "price": 60,   "category": "armor",  "inStock": True,  "quantity": 12},
+    {"id": 6, "name": "Mana Potion",   "price": 30,   "category": "potion", "inStock": False, "quantity": 0},
+    {"id": 7, "name": "War Axe",       "price": 150,  "category": "weapon", "inStock": True,  "quantity": 3},
+    {"id": 8, "name": "Elven Cloak",   "price": 95,   "category": "armor",  "inStock": True,  "quantity": 6},
+]
+
+orders = [
+    {"id": 1,  "userId": 1, "productId": 1, "quantity": 2, "total": 240,  "status": "completed"},
+    {"id": 2,  "userId": 2, "productId": 3, "quantity": 5, "total": 125,  "status": "pending"},
+    {"id": 3,  "userId": 1, "productId": 5, "quantity": 1, "total": 60,   "status": "completed"},
+    {"id": 4,  "userId": 3, "productId": 2, "quantity": 3, "total": 255,  "status": "shipped"},
+    {"id": 5,  "userId": 4, "productId": 7, "quantity": 1, "total": 150,  "status": "completed"},
+    {"id": 6,  "userId": 5, "productId": 3, "quantity": 4, "total": 100,  "status": "pending"},
+    {"id": 7,  "userId": 2, "productId": 8, "quantity": 2, "total": 190,  "status": "shipped"},
+    {"id": 8,  "userId": 6, "productId": 1, "quantity": 1, "total": 120,  "status": "pending"},
+    {"id": 9,  "userId": 4, "productId": 5, "quantity": 2, "total": 120,  "status": "completed"},
+    {"id": 10, "userId": 7, "productId": 2, "quantity": 1, "total": 85,   "status": "completed"},
+]
+
+students = [
+    {"id": 1, "name": "Liam",   "grades": [88, 92, 79, 95, 84], "attendance": 95},
+    {"id": 2, "name": "Mia",    "grades": [72, 68, 75, 80, 70], "attendance": 78},
+    {"id": 3, "name": "Noah",   "grades": [95, 98, 92, 97, 99], "attendance": 99},
+    {"id": 4, "name": "Olivia", "grades": [60, 65, 70, 58, 72], "attendance": 65},
+    {"id": 5, "name": "Pablo",  "grades": [85, 88, 83, 90, 87], "attendance": 92},
+    {"id": 6, "name": "Quinn",  "grades": [78, 74, 80, 76, 82], "attendance": 85},
+]

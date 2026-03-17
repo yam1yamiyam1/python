@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Cheat Sheet</title>
+<style>
+  :root {
+    --bg: #f7f7f5;
+    --surface: #ffffff;
+    --surface2: #f0efed;
+    --border: #d8d6d2;
+    --text: #1a1917;
+    --text2: #6b6965;
+    --accent: #d4501a;
+    --accent2: #2563a8;
+    --code-bg: #f0efed;
+    --tab-active-bg: #1a1917;
+    --tab-active-text: #f7f7f5;
+    --tab-hover: #e8e6e2;
+    --highlight: #fff3cd;
+    --row-hover: #f5f4f2;
+    --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Menlo', monospace;
+    --font-sans: 'IBM Plex Sans', 'Helvetica Neue', sans-serif;
+  }
+  [data-theme="dark"] {
+    --bg: #141412;
+    --surface: #1e1d1b;
+    --surface2: #272522;
+    --border: #383632;
+    --text: #e8e6e0;
+    --text2: #8a8680;
+    --accent: #e8714a;
+    --accent2: #5b9bd5;
+    --code-bg: #272522;
+    --tab-active-bg: #e8e6e0;
+    --tab-active-text: #141412;
+    --tab-hover: #2d2b28;
+    --highlight: #3a3000;
+    --row-hover: #242220;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.4;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--surface);
+    border-bottom: 0.5px solid var(--border);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: var(--font-mono);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .logo span { color: var(--text2); }
+
+  .search-wrap {
+    position: relative;
+    flex: 1;
+    max-width: 360px;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 9px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text2);
+    font-size: 12px;
+    pointer-events: none;
+  }
+
+  #search {
+    width: 100%;
+    padding: 6px 10px 6px 28px;
+    border: 0.5px solid var(--border);
+    border-radius: 4px;
+    background: var(--surface2);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  #search:focus { border-color: var(--accent); }
+  #search::placeholder { color: var(--text2); }
+
+  .search-count {
+    font-size: 11px;
+    color: var(--text2);
+    font-family: var(--font-mono);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .spacer { flex: 1; }
+
+  .theme-btn {
+    background: var(--surface2);
+    border: 0.5px solid var(--border);
+    color: var(--text);
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-family: var(--font-sans);
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
+  .theme-btn:hover { background: var(--tab-hover); }
+
+  /* TABS */
+  .tab-bar {
+    background: var(--surface);
+    border-bottom: 0.5px solid var(--border);
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding: 0 16px;
+    gap: 0;
+  }
+  .tab-bar::-webkit-scrollbar { display: none; }
+
+  .tab {
+    padding: 8px 14px;
+    font-size: 11.5px;
+    font-family: var(--font-mono);
+    color: var(--text2);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: color 0.12s;
+    user-select: none;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* CONTENT */
+  .content {
+    padding: 12px 16px 32px;
+    max-width: 1100px;
+  }
+
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; }
+
+  /* SEARCH RESULTS */
+  #search-results { display: none; }
+  #search-results.active { display: block; }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text2);
+    margin: 16px 0 6px;
+    font-family: var(--font-sans);
+  }
+
+  .section-label:first-child { margin-top: 0; }
+
+  /* TABLE */
+  .cheat-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 0.5px solid var(--border);
+    background: var(--surface);
+    margin-bottom: 14px;
+  }
+
+  .cheat-table thead th {
+    background: var(--surface2);
+    padding: 5px 10px;
+    text-align: left;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text2);
+    border-bottom: 0.5px solid var(--border);
+    font-family: var(--font-sans);
+  }
+
+  .cheat-table thead th:first-child {
+    color: var(--accent);
+  }
+  .cheat-table thead th:last-child {
+    color: var(--accent2);
+  }
+
+  .cheat-table tbody tr {
+    border-bottom: 0.5px solid var(--border);
+    transition: background 0.1s;
+  }
+  .cheat-table tbody tr:last-child { border-bottom: none; }
+  .cheat-table tbody tr:hover { background: var(--row-hover); }
+  .cheat-table tbody tr.hidden { display: none; }
+  .cheat-table tbody tr.highlighted { background: var(--highlight); }
+
+  .cheat-table td {
+    padding: 4px 10px;
+    vertical-align: top;
+  }
+
+  .cheat-table td:first-child {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    width: 50%;
+    color: var(--text);
+    word-break: break-word;
+  }
+
+  .cheat-table td:last-child {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text2);
+    word-break: break-word;
+  }
+
+  .note {
+    font-family: var(--font-sans) !important;
+    font-size: 11.5px !important;
+    font-style: italic;
+    color: var(--text2);
+  }
+
+  .kw { color: var(--accent); font-weight: 600; }
+  .kw2 { color: var(--accent2); font-weight: 600; }
+
+  mark {
+    background: #ffeb3b;
+    color: #000;
+    border-radius: 2px;
+    padding: 0 1px;
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 40px;
+    color: var(--text2);
+    font-size: 13px;
+  }
+
+  /* two-column layout for wider screens */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 14px;
+  }
+  @media (max-width: 680px) {
+    .two-col { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">py<span>.ref</span></div>
+  <div class="search-wrap">
+    <span class="search-icon">⌕</span>
+    <input type="text" id="search" placeholder="search syntax…" autocomplete="off" spellcheck="false">
+  </div>
+  <div class="search-count" id="search-count"></div>
+  <div class="spacer"></div>
+  <button class="theme-btn" id="theme-btn">☽ dark</button>
+</div>
+
+<div class="tab-bar" id="tab-bar">
+  <div class="tab active" data-tab="variables">variables</div>
+  <div class="tab" data-tab="control">control flow</div>
+  <div class="tab" data-tab="functions">functions</div>
+  <div class="tab" data-tab="structures">data structures</div>
+  <div class="tab" data-tab="strings">strings</div>
+  <div class="tab" data-tab="errors">errors</div>
+  <div class="tab" data-tab="jscomp">js → python</div>
+</div>
+
+<div class="content">
+
+<!-- SEARCH RESULTS -->
+<div id="search-results">
+  <div id="search-inner"></div>
+</div>
+
+<!-- VARIABLES -->
+<div class="tab-pane active" id="tab-variables">
+  <div class="two-col">
+  <div>
+    <div class="section-label">declaration &amp; types</div>
+    <table class="cheat-table">
+      <thead><tr><th>Python</th><th>note / JS equivalent</th></tr></thead>
+      <tbody>
+        <tr><td>x = 10</td><td class="note">dynamic; no keyword needed</td></tr>
+        <tr><td>x: int = 10</td><td class="note">type hint (not enforced)</td></tr>
+        <tr><td>x, y = 1, 2</td><td class="note">multiple assignment</td></tr>
+        <tr><td>x = y = 0</td><td class="note">chained assignment</td></tr>
+        <tr><td>type(x)</td><td class="note">returns &lt;class 'int'&gt; etc.</td></tr>
+        <tr><td>isinstance(x, int)</td><td class="note">preferred over type()</td></tr>
+        <tr><td>isinstance(x, (int, float))</td><td class="note">check multiple types</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-label">type conversion</div>
+    <table class="cheat-table">
+      <thead><tr><th>Python</th><th>note</th></tr></thead>
+      <tbody>
+        <tr><td>int("42")</td><td class="note">str → int</td></tr>
+        <tr><td>float("3.14")</td><td class="note">str → float</td></tr>
+        <tr><td>str(42)</td><td class="note">int → str</td></tr>
+        <tr><td>bool(0)</td><td class="note">→ False</td></tr>
+        <tr><td>list((1,2,3))</td><td class="note">tuple → list</td></tr>
+        <tr><td>tuple([1,2,3])</td><td class="note">list → tuple</td></tr>
+        <tr><td>set([1,1,2])</td><td class="note">list → set (dedupes)</td></tr>
+        <tr><td>int("ff", 16)</td><td class="note">hex str → int (255)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div>
+    <div class="section-label">None &amp; falsy values</div>
+    <table class="cheat-table">
+      <thead><tr><th>Python</th><th>note</th></tr></thead>
+      <tbody>
+        <tr><td>x is None</td><td class="note">identity check (not ==)</td></tr>
+        <tr><td>x is not None</td><td class="note">not-None check</td></tr>
+        <tr><td>False</td><td class="note">falsy</td></tr>
+        <tr><td>None</td><td class="note">falsy</td></tr>
+        <tr><td>0, 0.0, 0j</td><td class="note">falsy</td></tr>
+        <tr><td>"", [], {}, set()</td><td class="note">falsy (empty containers)</td></tr>
+        <tr><td>x = x or default</td><td class="note">fallback if falsy</td></tr>
+        <tr><td>x = x if x is not None else d</td><td class="note">None-safe fallback</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-label">unpacking &amp; swap</div>
+    <table class="cheat-table">
+      <thead><tr><th>Python</th><th>note</th></tr></thead>
+      <tbody>
+        <tr><td>a, b = b, a</td><td class="note">swap without temp var</td></tr>
+        <tr><td>first, *rest = [1,2,3,4]</td><td class="note">first=1, rest=[2,3,4]</td></tr>
+        <tr><td>*init, last = [1,2,3,4]</td><td class="note">last=4, init=[1,2,3]</td></tr>
+        <tr><td>a, _, c = (1,2,3)</td><td class="note">_ = ignored value</td></tr>
+        <tr><td>a, (b, c) = 1, (2, 3)</td><td class="note">nested unpacking</td></tr>
+        <tr><td>x = a if cond else b</td><td class="note">ternary / conditional expr</td></tr>
+      </tbody>
+    </table>
+  </div>
+  </div>
+</div>
+
+<!-- CONTROL FLOW -->
+<div class="tab-pane" id="tab-control">
+  <div class="two-col">
+  <div>
+    <div class="section-label">comparison &amp; logical</div>
+    <table class="cheat-table">
+      <thead><tr><th>Python</th><th>note / JS equivalent</th></tr></thead>
+      <tbody>
+        <tr><td>==  !=</td><td>==  !==</td></tr>
+        <tr><td>&lt;  &gt;  &lt;=  &gt;=</td><td class="note">same</td></tr>
+        <tr><td>is  is not</td><td>===  !==  (identity)</td></tr>
+        <tr><td>in  not in</td><td>.includes()  /  !arr.includes()</td></tr>
+        <tr><td>and  or  not</td><td>&amp;&amp;  ||  !</td></tr>
+        <tr><td>1 &lt; x &lt; 10</td><td class="note">chained comparison (no JS equiv)</td></tr>
+        <tr><td>a == b == c</td><td class="note">chained equality</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-label">if / elif / else</div>
+    <table class="cheat-table">
+      <thead><tr><th>Python</th><th>note</th></tr></thead>
+      <tbody>
+        <tr><td>if x:</td><td class="note">truthy check</td></tr>
+        <tr><td>if x is None:</td><td class="note">None check</td></tr>
+        <tr><td>elif x &gt; 0:</td><td class="note">else if</td></tr>
+        <tr><td>else:</td><td class="note">fallthrough</td></tr>
+        <tr><td>v = "yes" if x else "no"</td><td class="note">ternary expression</td></tr>
+        <tr><td>match x:<br>&nbsp;&nbsp;case 1: ...<br>&nbsp;&nbsp;case _: ...</td><td class="note">match/case (3.10+); like switch</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-label">for loops</div>
+    <table class="cheat-table">
+      <thead><tr><th>Python</th><th>note</th></tr></thead>
+      <tbody>
+        <tr><td>for x in iterable:</td><td class="note">for..of equivalent</td></tr>
+        <tr><td>for i in range(5):</td><td class="note">0,1,2,3,4</td></tr>
+        <tr><td>for i in range(1,10,2):</td><td class="note">start, stop, step</td></tr>
+        <tr><td>for i in range(9,-1,-1):</td><td class="note">countdown 9→0</td></tr>
+        <tr><td>for i, v in enumerate(lst):</td><td class="note">index + value</td></tr>
+        <tr><td>for a, b in zip(l1, l2):</td><td class="note">parallel iteration</td></tr>
+        <tr><td>for k, v in d.items():</td><td class="note">dict iteration</td></tr>
+        <tr><td>for x in reversed(lst):</td><td class="note">iterate backwards</td></tr>
+        <tr><td>for x in sorted(lst):</td><td class="note">iterate sorted copy</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div>
+    <div class="section-label">for..else / while</div>
+    <table class="cheat-table">
+      <thead><tr><th>Python</th><th>note</th></tr></thead>
+      <tbody>
+        <tr><td>for x in lst:<br>&nbsp;&nbsp;...<br>else:<br>&nbsp;&nbsp;...</td><td class="note">else runs if no break</td></tr>
+        <tr><td>while condition:</td><td class="note">standard while loop</td></tr>
+        <tr><td>while True:<br>&nbsp;&nbsp;if cond: break</td><td class="note">loop with exit</td></tr>
+        <tr><td>while x := next(it, None):</td><td class="note">walrus assignment in loop</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-label">loop control</div>
+    <table class="cheat-table">
+      <thead><tr><th>Python</th><th>note</th></tr></thead>
+      <tbody>
+        <tr><td>break</td><td class="note">exit loop immediately</td></tr>
+        <tr><td>continue</td><td class="note">skip to next iteration</td></tr>
+        <tr><td>pass</td><td class="note">no-op placeholder</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-label">useful itertools patterns</div>
+    <table class="cheat-table">
+      <thead><tr><th>Python</th><th>note</th></tr></thead>
+      <tbody>
+        <tr><td>zip(a, b, strict=True)</td><td class="note">raises if lengths differ (3.10+)</td></tr>
+        <tr><td>enumerate(lst, start=1)</td><td class="note">start index at 1</td></tr>
+        <tr><td>zip(*matrix)</td><td class="note">transpose 2D list</td></tr>
+        <tr><td>map(fn, lst)</td><td class="note">lazy map; wrap in list()</td></tr>
+        <tr><td>filter(fn, lst)</td><td class="note">lazy filter; wrap in list()</td></tr>
+      </tbody>
+    </table>
+  </div>
+  </div>
+</div>
+
+<!-- FUNCTIONS -->
+<div class="tab-pane" id="tab-functions">
+  <div class="two-col">
+  <div>
+    <div class="section-label">definition &amp; arguments</div>
+    <table class="cheat-table">
+      <thead><tr><th>Python</th><th>note</th></tr></thead>
+      <tbody>
+        <tr><td>def fn(x, y):</td><td class="note">basic function</td></tr>
+        <tr><td>def fn(x, y=0):</td><td class="note">default argument</td></tr>
+        <tr><td>def fn(*args):</td><td class="note">variadic positional → tuple</td></tr>
+        <tr><td>def fn(**kwargs):</td><td class="note">variadic keyword → dict</td></tr>
+        <tr><td>def fn(*args, **kwargs):</td><td class="note">both; args before kwargs</td></tr>
+        <tr><td>def fn(a, /, b, *, c):</td><td class="note">/ = pos-only, * = kw-only</td></tr>
+        <tr><td>def fn(x: int) -&gt; str:</td><td class="note">type hints</td></tr>
+        <tr><td>return x, y</td><td class="note">returns tuple</td></tr>
+        <tr><td>return</td><td class="note">returns None</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-label">calling functions</div>
+    <table class="cheat-table">
+      <thead><tr><th>Python</th><th>note</th></tr></thead>
+      <tbody>
+        <tr><td>fn(1, 2)</td><td class="note">positional</td></tr>
+        <tr><td>fn(x=1, y=2)</td><td class="note">keyword</td></tr>
+        <tr><td>fn(*[1,2])</td><td class="note">unpack list as args</td></tr>
+        <tr><td>fn(**{"x":1})</td><td class="note">unpack dict as kwargs</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div>
+    <div class="section-label">lambda &amp; closures</div>
+    <table class="cheat-table">
+      <thead><tr><th>Python</th><th>note</th></tr></thead>
+      <tbody>
+        <tr><td>f = lambda x: x * 2</td><td class="note">single-expression fn</td></tr>
+        <tr><td>f = lambda x, y=0: x + y</td><td class="note">lambda with default</td></tr>
+        <tr><td>sorted(lst, key=lambda x: x[1])</td><td class="note">inline key fn</td></tr>
+        <tr><td>sorted(lst, key=lambda x: -x)</td><td class="note">reverse sort</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-label">scope &amp; decorators</div>
+    <table class="cheat-table">
+      <thead><tr><th>Python</th><th>note</th></tr></thead>
+      <tbody>
+        <tr><td>global x</td><td class="note">modify module-level var</td></tr>
+        <tr><td>nonlocal x</td><td class="note">modify enclosing scope var</td></tr>
+        <tr><td>@decorator</td><td class="note">wraps the function below</td></tr>
+        <tr><td>@staticmethod</td><td class="note">no self/cls argument</td></tr>
+        <tr><td>@classmethod</td><td class="note">receives cls as first arg</td></tr>
+        <tr><td>@property</td><td class="note">getter accessed as attribute</td></tr>
+        <tr><td>fn.__doc__</td><td class="note">docstring access</td></tr>
+        <tr><td>fn.__name__</td><td class="note">function name as string</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-label">generators</div>
+    <table class="cheat-table">
+      <thead><tr><th>Python</th><th>note</th></tr></thead>
+      <tbody>
+        <tr><td>yield value</td><td class="note">turns fn into generator</td></tr>
+        <tr><td>yield from iterable</td><td class="note">delegate to sub-iterable</td></tr>
+        <tr><td>(x*2 for x in lst)</td><td class="note">generator expression (lazy)</td></tr>
+        <tr><td>next(gen)</td><td class="note">advance generator</td></tr>
+      </tbody>
+    </table>
+  </div>
+  </div>
+</div>
+
+<!-- DATA STRUCTURES -->
+<div class="tab-pane" id="tab-structures">
+  <div class="two-col">
+  <div>
+    <div class="section-label">list</div>
+    <table class="cheat-table">
+      <thead><tr><th>Python</th><th>note</th></tr></thead>
+      <tbody>
+        <tr><td>lst = [1, 2, 3]</td><td class="note">ordered, mutable</td></tr>
+        <tr><td>lst[0]  lst[-1]</td><td class="note">index; -1 = last</td></tr>
+        <tr><td>lst[1:3]  lst[::2]</td><td class="note">slice; step</td></tr>
+        <tr><td>lst.append(x)</td><td class="note">add to end — O(1)</td></tr>
+        <tr><td>lst.extend(iterable)</td><td class="note">add multiple items</td></tr>
+        <tr><td>lst.insert(i, x)</td><td class="note">insert at index — O(n)</td></tr>
+        <tr><td>lst.pop()  lst.pop(i)</td><td class="note">remove last / by index</td></tr>
+        <tr><td>lst.remove(x)</td><td class="note">remove first occurrence</td></tr>
+        <tr><td>lst.index(x)</td><td class="note">find first index of x</td></tr>
+        <tr><td>lst.count(x)</td><td class="note">count occurrences</td></tr>
+        <tr><td>lst.sort(key=fn, reverse=True)</td><td class="note">in-place sort</td></tr>
+        <tr><td>sorted(lst)</td><td class="note">returns new sorted list</td></tr>
+        <tr><td>lst.reverse()</td><td class="note">in-place reverse</td></tr>
+        <tr><td>lst.copy()</td><td class="note">shallow copy</td></tr>
+        <tr><td>lst.clear()</td><td class="note">remove all items</td></tr>
+        <tr><td>len(lst)</td><td class="note">length</td></tr>
+        <tr><td>lst + [4,5]</td><td class="note">concatenate</td></tr>
+        <tr><td>lst * 3</td><td class="note">repeat</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-label">tuple</div>
+    <table class="cheat-table">
+      <thead><tr><th>Python</th><th>note</th></tr></thead>
+      <tbody>
+        <tr><td>t = (1, 2, 3)</td><td class="note">ordered, immutable</td></tr>
+        <tr><td>t = (1,)</td><td class="note">single-element tuple (comma!)</td></tr>
+        <tr><td>t.count(x)  t.index(x)</td><td class="note">only two methods</td></tr>
+        <tr><td>a, b, c = t</td><td class="note">unpack</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-label">set</div>
+    <table class="cheat-table">
+      <thead><tr><th>Python</th><th>note</th></tr></thead>
+      <tbody>
+        <tr><td>s = {1, 2, 3}</td><td class="note">unordered, unique, mutable</td></tr>
+        <tr><td>s = set()</td><td class="note">empty set ({} makes dict!)</td></tr>
+        <tr><td>s.add(x)  s.remove(x)</td><td class="note">add/remove (remove raises)</td></tr>
+        <tr><td>s.discard(x)</td><td class="note">remove, no error if missing</td></tr>
+        <tr><td>s1 | s2</td><td class="note">union</td></tr>
+        <tr><td>s1 &amp; s2</td><td class="note">intersection</td></tr>
+        <tr><td>s1 - s2</td><td class="note">difference</td></tr>
+        <tr><td>s1 ^ s2</td><td class="note">symmetric difference</td></tr>
+        <tr><td>s1 &lt;= s2</td><td class="note">is subset of</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div>
+    <div class="section-label">dict</div>
+    <table class="cheat-table">
+      <thead><tr><th>Python</th><th>note</th></tr></thead>
+      <tbody>
+        <tr><td>d = {"key": val}</td><td class="note">key-value pairs</td></tr>
+        <tr><td>d["key"]</td><td class="note">access (raises KeyError)</td></tr>
+        <tr><td>d.get("key", default)</td><td class="note">safe access</td></tr>
+        <tr><td>d["key"] = val</td><td class="note">set / update</td></tr>
+        <tr><td>del d["key"]</td><td class="note">delete key</td></tr>
+        <tr><td>d.pop("key", None)</td><td class="note">remove &amp; return, safe</td></tr>
+        <tr><td>d.keys()</td><td class="note">dict_keys view</td></tr>
+        <tr><td>d.values()</td><td class="note">dict_values view</td></tr>
+        <tr><td>d.items()</td><td class="note">dict_items of (k,v) tuples</td></tr>
+        <tr><td>"key" in d</td><td class="note">key membership check</td></tr>
+        <tr><td>d.update({"a": 1})</td><td class="note">merge into d</td></tr>
+        <tr><td>d1 | d2</td><td class="note">merge, d2 wins (3.9+)</td></tr>
+        <tr><td>d.setdefault("k", [])</td><td class="note">set if missing, return val</td></tr>
+        <tr><td>dict.fromkeys(keys, 0)</td><td class="note">init dict from keys</td></tr>
+        <tr><td>len(d)  d.clear()</td><td class="note">length / clear all</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-label">comprehensions</div>
+    <table class="cheat-table">
+      <thead><tr><th>Python</th><th>note</th></tr></thead>
+      <tbody>
+        <tr><td>[x*2 for x in lst]</td><td class="note">list comprehension</td></tr>
+        <tr><td>[x for x in lst if x&gt;0]</td><td class="note">with filter</td></tr>
+        <tr><td>{k:v for k,v in d.items()}</td><td class="note">dict comprehension</td></tr>
+        <tr><td>{x*2 for x in lst}</td><td class="note">set comprehension</td></tr>
+        <tr><td>[f(x) if c else g(x) for x in l]</td><td class="note">conditional transform</td></tr>
+        <tr><td>[x for row in mat for x in row]</td><td class="note">flatten 2D list</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-label">builtins</div>
+    <table class="cheat-table">
+      <thead><tr><th>Python</th><th>note</th></tr></thead>
+      <tbody>
+        <tr><td>sum(lst)</td><td class="note">total of numeric iterable</td></tr>
+        <tr><td>sum(lst, start=0)</td><td class="note">with starting value</td></tr>
+        <tr><td>min(lst)  max(lst)</td><td class="note">min / max value</td></tr>
+        <tr><td>min(lst, key=fn)</td><td class="note">by key function</td></tr>
+        <tr><td>any(lst)</td><td class="note">True if any truthy</td></tr>
+        <tr><td>all(lst)</td><td class="note">True if all truthy</td></tr>
+        <tr><td>len(x)</td><td class="note">length of any container</td></tr>
+      </tbody>
+    </table>
+  </div>
+  </div>
+</div>
+
+<!-- STRINGS -->
+<div class="tab-pane" id="tab-strings">
+  <div class="two-col">
+  <div>
+    <div class="section-label">f-strings &amp; formatting</div>
+    <table class="cheat-table">
+      <thead><tr><th>Python</th><th>output / note</th></tr></thead>
+      <tbody>
+        <tr><td>f"hi {name}"</td><td class="note">basic interpolation</td></tr>
+        <tr><td>f"{x:.2f}"</td><td class="note">2 decimal places: 3.14</td></tr>
+        <tr><td>f"{x:,}"</td><td class="note">thousands sep: 1,000,000</td></tr>
+        <tr><td>f"{x:e}"</td><td class="note">scientific: 1.23e+04</td></tr>
+        <tr><td>f"{x:08d}"</td><td class="note">zero-pad: 00000042</td></tr>
+        <tr><td>f"{x:&lt;10}"</td><td class="note">left-align, width 10</td></tr>
+        <tr><td>f"{x:&gt;10}"</td><td class="note">right-align, width 10</td></tr>
+        <tr><td>f"{x:^10}"</td><td class="note">center, width 10</td></tr>
+        <tr><td>f"{x:+.1f}"</td><td class="note">force sign: +3.1</td></tr>
+        <tr><td>f"{x:#b}"</td><td class="note">binary with prefix: 0b1010</td></tr>
+        <tr><td>f"{x:#x}"</td><td class="note">hex with prefix: 0xff</td></tr>
+        <tr><td>f"{x:#o}"</td><td class="note">octal with prefix: 0o17</td></tr>
+        <tr><td>f"{x!r}"</td><td class="note">repr() of x</td></tr>
+        <tr><td>f"{x!s}"</td><td class="note">str() of x</td></tr>
+        <tr><td>f"{x=}"</td><td class="note">debug: prints "x=42"</td></tr>
+        <tr><td>f"{len(s):.0%}"</td><td class="note">percentage: 75%</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div>
+    <div class="section-label">string methods</div>
+    <table class="cheat-table">
+      <thead><tr><th>Python</th><th>note</th></tr></thead>
+      <tbody>
+        <tr><td>s.upper()  s.lower()</td><td class="note">case conversion</td></tr>
+        <tr><td>s.title()  s.capitalize()</td><td class="note">Title Case / First char</td></tr>
+        <tr><td>s.strip()  s.lstrip()  s.rstrip()</td><td class="note">remove whitespace</td></tr>
+        <tr><td>s.strip("xy")</td><td class="note">remove specific chars</td></tr>
+        <tr><td>s.split()  s.split(",")</td><td class="note">split on whitespace / char</td></tr>
+        <tr><td>s.splitlines()</td><td class="note">split on \n</td></tr>
+        <tr><td>",".join(lst)</td><td class="note">join list to string</td></tr>
+        <tr><td>s.replace("a","b")</td><td class="note">replace all occurrences</td></tr>
+        <tr><td>s.replace("a","b",n)</td><td class="note">replace first n</td></tr>
+        <tr><td>s.find("x")  s.rfind("x")</td><td class="note">index or -1</td></tr>
+        <tr><td>s.index("x")</td><td class="note">index or raises ValueError</td></tr>
+        <tr><td>s.startswith("x")</td><td class="note">bool</td></tr>
+        <tr><td>s.endswith(("a","b"))</td><td class="note">check multiple suffixes</td></tr>
+        <tr><td>s.count("x")</td><td class="note">occurrences (non-overlap)</td></tr>
+        <tr><td>s.isdigit()  s.isalpha()</td><td class="note">char class checks</td></tr>
+        <tr><td>s.isalnum()  s.isspace()</td><td class="note">alphanumeric / whitespace</td></tr>
+        <tr><td>s.zfill(5)</td><td class="note">zero-pad to width 5</td></tr>
+        <tr><td>s.center(10, "-")</td><td class="note">---hello---</td></tr>
+        <tr><td>s.ljust(10)  s.rjust(10)</td><td class="note">pad with spaces</td></tr>
+        <tr><td>s.encode("utf-8")</td><td class="note">→ bytes</td></tr>
+        <tr><td>b"hi".decode("utf-8")</td><td class="note">bytes → str</td></tr>
+        <tr><td>s[::−1]</td><td class="note">reverse a string</td></tr>
+        <tr><td>"x" in s</td><td class="note">substring check</td></tr>
+      </tbody>
+    </table>
+  </div>
+  </div>
+</div>
+
+<!-- ERRORS -->
+<div class="tab-pane" id="tab-errors">
+  <div class="two-col">
+  <div>
+    <div class="section-label">try / except / else / finally</div>
+    <table class="cheat-table">
+      <thead><tr><th>Python</th><th>note</th></tr></thead>
+      <tbody>
+        <tr><td>try:<br>&nbsp;&nbsp;risky()</td><td class="note">guarded block</td></tr>
+        <tr><td>except ValueError:</td><td class="note">catch specific type</td></tr>
+        <tr><td>except (TypeError, KeyError):</td><td class="note">catch multiple types</td></tr>
+        <tr><td>except Exception as e:</td><td class="note">catch with binding</td></tr>
+        <tr><td>except Exception as e:<br>&nbsp;&nbsp;raise</td><td class="note">re-raise same exception</td></tr>
+        <tr><td>except Exception as e:<br>&nbsp;&nbsp;raise RuntimeError("msg") from e</td><td class="note">chain exceptions</td></tr>
+        <tr><td>except *ValueError:</td><td class="note">ExceptionGroup (3.11+)</td></tr>
+        <tr><td>else:<br>&nbsp;&nbsp;success()</td><td class="note">runs if no exception</td></tr>
+        <tr><td>finally:<br>&nbsp;&nbsp;cleanup()</td><td class="note">always runs</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-label">raise &amp; assert</div>
+    <table class="cheat-table">
+      <thead><tr><th>Python</th><th>note</th></tr></thead>
+      <tbody>
+        <tr><td>raise ValueError("msg")</td><td class="note">throw exception</td></tr>
+        <tr><td>raise</td><td class="note">re-raise current exception</td></tr>
+        <tr><td>raise ValueError from None</td><td class="note">suppress context</td></tr>
+        <tr><td>assert x &gt; 0, "msg"</td><td class="note">raise AssertionError if False</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div>
+    <div class="section-label">common built-in exceptions</div>
+    <table class="cheat-table">
+      <thead><tr><th>Exception</th><th>when it occurs</th></tr></thead>
+      <tbody>
+        <tr><td>Exception</td><td class="note">base for most errors</td></tr>
+        <tr><td>ValueError</td><td class="note">wrong value (int("a"))</td></tr>
+        <tr><td>TypeError</td><td class="note">wrong type ("a" + 1)</td></tr>
+        <tr><td>KeyError</td><td class="note">missing dict key</td></tr>
+        <tr><td>IndexError</td><td class="note">list index out of range</td></tr>
+        <tr><td>AttributeError</td><td class="note">object lacks attribute</td></tr>
+        <tr><td>NameError</td><td class="note">undefined variable</td></tr>
+        <tr><td>ImportError</td><td class="note">module not found</td></tr>
+        <tr><td>FileNotFoundError</td><td class="note">file doesn't exist</td></tr>
+        <tr><td>PermissionError</td><td class="note">OS permission denied</td></tr>
+        <tr><td>OSError</td><td class="note">OS-level error base</td></tr>
+        <tr><td>ZeroDivisionError</td><td class="note">division by zero</td></tr>
+        <tr><td>OverflowError</td><td class="note">too large for float</td></tr>
+        <tr><td>RecursionError</td><td class="note">max recursion depth hit</td></tr>
+        <tr><td>StopIteration</td><td class="note">iterator exhausted</td></tr>
+        <tr><td>RuntimeError</td><td class="note">general runtime error</td></tr>
+        <tr><td>NotImplementedError</td><td class="note">abstract method not impl.</td></tr>
+        <tr><td>TimeoutError</td><td class="note">operation timed out</td></tr>
+        <tr><td>MemoryError</td><td class="note">out of memory</td></tr>
+        <tr><td>AssertionError</td><td class="note">assert failed</td></tr>
+        <tr><td>SystemExit</td><td class="note">sys.exit() called</td></tr>
+        <tr><td>KeyboardInterrupt</td><td class="note">Ctrl+C pressed</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-label">custom exceptions &amp; context managers</div>
+    <table class="cheat-table">
+      <thead><tr><th>Python</th><th>note</th></tr></thead>
+      <tbody>
+        <tr><td>class MyError(Exception): pass</td><td class="note">define custom error</td></tr>
+        <tr><td>class MyError(ValueError):<br>&nbsp;&nbsp;def __init__(self, msg, code):</td><td class="note">with extra attributes</td></tr>
+        <tr><td>with open("f") as f:</td><td class="note">auto-close; context manager</td></tr>
+        <tr><td>with A() as a, B() as b:</td><td class="note">multiple contexts</td></tr>
+      </tbody>
+    </table>
+  </div>
+  </div>
+</div>
+
+<!-- JS → PYTHON -->
+<div class="tab-pane" id="tab-jscomp">
+  <div class="two-col">
+  <div>
+    <div class="section-label">variables &amp; operators</div>
+    <table class="cheat-table">
+      <thead><tr><th>JavaScript</th><th>Python</th></tr></thead>
+      <tbody>
+        <tr><td>let x = 5; const y = 10;</td><td>x = 5; y = 10</td></tr>
+        <tr><td>var x = 5</td><td class="note">no var keyword in Python</td></tr>
+        <tr><td>===  !==</td><td>==  !=  (or is / is not)</td></tr>
+        <tr><td>&&  ||  !</td><td>and  or  not</td></tr>
+        <tr><td>x ?? defaultVal</td><td>x if x is not None else default</td></tr>
+        <tr><td>x?.prop</td><td class="note">no ?. — use getattr(x,"prop",None)</td></tr>
+        <tr><td>null  undefined</td><td>None</td></tr>
+        <tr><td>NaN</td><td>float("nan")  or  math.nan</td></tr>
+        <tr><td>Infinity</td><td>float("inf")</td></tr>
+        <tr><td>typeof x</td><td>type(x).__name__</td></tr>
+        <tr><td>x ** 2</td><td>x ** 2</td></tr>
+        <tr><td>Math.floor(x)</td><td>x // 1  or  math.floor(x)</td></tr>
+        <tr><td>Math.round(x)</td><td>round(x)</td></tr>
+        <tr><td>parseInt("42")</td><td>int("42")</td></tr>
+        <tr><td>parseFloat("3.14")</td><td>float("3.14")</td></tr>
+        <tr><td>String(x)</td><td>str(x)</td></tr>
+        <tr><td>Boolean(x)</td><td>bool(x)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-label">arrays → lists</div>
+    <table class="cheat-table">
+      <thead><tr><th>JavaScript</th><th>Python</th></tr></thead>
+      <tbody>
+        <tr><td>const a = [1,2,3]</td><td>a = [1,2,3]</td></tr>
+        <tr><td>a.push(x)</td><td>a.append(x)</td></tr>
+        <tr><td>a.pop()</td><td>a.pop()</td></tr>
+        <tr><td>a.shift()</td><td>a.pop(0)  (O(n))</td></tr>
+        <tr><td>a.unshift(x)</td><td>a.insert(0, x)  (O(n))</td></tr>
+        <tr><td>a.length</td><td>len(a)</td></tr>
+        <tr><td>a.includes(x)</td><td>x in a</td></tr>
+        <tr><td>a.indexOf(x)</td><td>a.index(x)  (raises if missing)</td></tr>
+        <tr><td>a.slice(1,3)</td><td>a[1:3]</td></tr>
+        <tr><td>a.splice(1,2)</td><td>del a[1:3]  or  a[1:3] = []</td></tr>
+        <tr><td>a.concat(b)</td><td>a + b</td></tr>
+        <tr><td>a.reverse()</td><td>a.reverse()  (in-place)</td></tr>
+        <tr><td>[...a]  /  a.slice()</td><td>a.copy()  or  a[:]</td></tr>
+        <tr><td>a.flat()</td><td>[x for row in a for x in row]</td></tr>
+        <tr><td>a.flatMap(fn)</td><td>[y for x in a for y in fn(x)]</td></tr>
+        <tr><td>a.join(",")</td><td>",".join(a)</td></tr>
+        <tr><td>a.fill(0)</td><td>[0] * len(a)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div>
+    <div class="section-label">array higher-order → list methods</div>
+    <table class="cheat-table">
+      <thead><tr><th>JavaScript</th><th>Python</th></tr></thead>
+      <tbody>
+        <tr><td>a.map(fn)</td><td>[fn(x) for x in a]  or  list(map(fn,a))</td></tr>
+        <tr><td>a.filter(fn)</td><td>[x for x in a if fn(x)]</td></tr>
+        <tr><td>a.reduce(fn, init)</td><td>functools.reduce(fn, a, init)</td></tr>
+        <tr><td>a.forEach(fn)</td><td>for x in a: fn(x)</td></tr>
+        <tr><td>a.find(fn)</td><td>next((x for x in a if fn(x)), None)</td></tr>
+        <tr><td>a.findIndex(fn)</td><td>next((i for i,x in enumerate(a) if fn(x)),-1)</td></tr>
+        <tr><td>a.some(fn)</td><td>any(fn(x) for x in a)</td></tr>
+        <tr><td>a.every(fn)</td><td>all(fn(x) for x in a)</td></tr>
+        <tr><td>a.sort((a,b)=&gt;a-b)</td><td>a.sort()  or  sorted(a)</td></tr>
+        <tr><td>a.sort((a,b)=&gt;b-a)</td><td>a.sort(reverse=True)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-label">objects → dicts</div>
+    <table class="cheat-table">
+      <thead><tr><th>JavaScript</th><th>Python</th></tr></thead>
+      <tbody>
+        <tr><td>const o = {a:1, b:2}</td><td>d = {"a":1, "b":2}</td></tr>
+        <tr><td>o.key  o["key"]</td><td>d["key"]  or  d.get("key")</td></tr>
+        <tr><td>o.key = v</td><td>d["key"] = v</td></tr>
+        <tr><td>delete o.key</td><td>del d["key"]</td></tr>
+        <tr><td>"key" in o</td><td>"key" in d</td></tr>
+        <tr><td>Object.keys(o)</td><td>d.keys()</td></tr>
+        <tr><td>Object.values(o)</td><td>d.values()</td></tr>
+        <tr><td>Object.entries(o)</td><td>d.items()</td></tr>
+        <tr><td>{...o, c:3}</td><td>{**d, "c":3}  or  d | {"c":3}</td></tr>
+        <tr><td>Object.assign({}, o)</td><td>d.copy()  or  {**d}</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-label">strings</div>
+    <table class="cheat-table">
+      <thead><tr><th>JavaScript</th><th>Python</th></tr></thead>
+      <tbody>
+        <tr><td>`hello ${name}`</td><td>f"hello {name}"</td></tr>
+        <tr><td>s.length</td><td>len(s)</td></tr>
+        <tr><td>s.includes("x")</td><td>"x" in s</td></tr>
+        <tr><td>s.startsWith("x")</td><td>s.startswith("x")</td></tr>
+        <tr><td>s.endsWith("x")</td><td>s.endswith("x")</td></tr>
+        <tr><td>s.indexOf("x")</td><td>s.find("x")</td></tr>
+        <tr><td>s.slice(1,3)</td><td>s[1:3]</td></tr>
+        <tr><td>s.toUpperCase()  s.toLowerCase()</td><td>s.upper()  s.lower()</td></tr>
+        <tr><td>s.trim()  s.trimStart()  s.trimEnd()</td><td>s.strip()  s.lstrip()  s.rstrip()</td></tr>
+        <tr><td>s.split(",")  s.split("")</td><td>s.split(",")  list(s)</td></tr>
+        <tr><td>s.repeat(3)</td><td>s * 3</td></tr>
+        <tr><td>s.padStart(5,"0")</td><td>s.zfill(5)  or  s.rjust(5,"0")</td></tr>
+        <tr><td>s.replace(/x/g,"y")</td><td>s.replace("x","y")</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-label">loops &amp; control</div>
+    <table class="cheat-table">
+      <thead><tr><th>JavaScript</th><th>Python</th></tr></thead>
+      <tbody>
+        <tr><td>for (let i=0;i&lt;n;i++)</td><td>for i in range(n):</td></tr>
+        <tr><td>for (const x of arr)</td><td>for x in lst:</td></tr>
+        <tr><td>for (const k in obj)</td><td>for k in d:  (keys only)</td></tr>
+        <tr><td>while (cond)</td><td>while cond:</td></tr>
+        <tr><td>x ? a : b</td><td>a if x else b</td></tr>
+        <tr><td>switch(x) { case 1: ... }</td><td>match x:<br>&nbsp;&nbsp;case 1: ...</td></tr>
+        <tr><td>console.log(x)</td><td>print(x)</td></tr>
+        <tr><td>JSON.stringify(obj)</td><td>import json; json.dumps(d)</td></tr>
+        <tr><td>JSON.parse(str)</td><td>json.loads(s)</td></tr>
+        <tr><td>Math.max(...a)</td><td>max(a)</td></tr>
+        <tr><td>Math.min(...a)</td><td>min(a)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<script>
+  // THEME
+  const themeBtn = document.getElementById("theme-btn");
+  let dark = false;
+  themeBtn.addEventListener("click", () => {
+    dark = !dark;
+    document.documentElement.setAttribute("data-theme", dark ? "dark" : "");
+    themeBtn.textContent = dark ? "☀ light" : "☽ dark";
+  });
+
+  // TABS
+  const tabs = document.querySelectorAll(".tab");
+  const panes = document.querySelectorAll(".tab-pane");
+  const searchResults = document.getElementById("search-results");
+  const searchInner = document.getElementById("search-inner");
+  const searchInput = document.getElementById("search");
+  const searchCount = document.getElementById("search-count");
+
+  let activeTab = "variables";
+
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      tabs.forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      activeTab = tab.dataset.tab;
+      if (!searchInput.value.trim()) {
+        showTab(activeTab);
+      }
+    });
+  });
+
+  function showTab(id) {
+    panes.forEach(p => p.classList.remove("active"));
+    searchResults.classList.remove("active");
+    const pane = document.getElementById("tab-" + id);
+    if (pane) pane.classList.add("active");
+  }
+
+  showTab("variables");
+
+  // SEARCH
+  function getAllRows() {
+    const rows = [];
+    panes.forEach(pane => {
+      const tabId = pane.id.replace("tab-", "");
+      const tabLabel = document.querySelector(`.tab[data-tab="${tabId}"]`)?.textContent || tabId;
+      const sections = pane.querySelectorAll(".section-label");
+      const tables = pane.querySelectorAll(".cheat-table");
+      tables.forEach((table, ti) => {
+        const section = sections[ti] ? sections[ti].textContent : "";
+        table.querySelectorAll("tbody tr").forEach(row => {
+          rows.push({ row, tabId, tabLabel, section });
+        });
+      });
+    });
+    return rows;
+  }
+
+  let allRows = null;
+
+  searchInput.addEventListener("input", () => {
+    const q = searchInput.value.trim().toLowerCase();
+
+    if (!q) {
+      searchCount.textContent = "";
+      searchResults.classList.remove("active");
+      showTab(activeTab);
+      return;
+    }
+
+    if (!allRows) allRows = getAllRows();
+
+    // Hide all panes, show search results
+    panes.forEach(p => p.classList.remove("active"));
+    searchResults.classList.add("active");
+
+    // Group matches by tab
+    const groups = {};
+    let total = 0;
+
+    allRows.forEach(({ row, tabId, tabLabel, section }) => {
+      const text = row.textContent.toLowerCase();
+      if (text.includes(q)) {
+        total++;
+        if (!groups[tabId]) groups[tabId] = { tabLabel, sections: {} };
+        if (!groups[tabId].sections[section]) groups[tabId].sections[section] = [];
+        groups[tabId].sections[section].push(row);
+      }
+    });
+
+    if (total === 0) {
+      searchInner.innerHTML = `<div class="no-results">no results for "<strong>${escHtml(q)}</strong>"</div>`;
+      searchCount.textContent = "0 results";
+      return;
+    }
+
+    searchCount.textContent = `${total} result${total !== 1 ? "s" : ""}`;
+
+    let html = "";
+    for (const [tabId, { tabLabel, sections }] of Object.entries(groups)) {
+      html += `<div class="section-label">${escHtml(tabLabel)}</div>`;
+      for (const [section, rows] of Object.entries(sections)) {
+        if (section) html += `<div class="section-label" style="font-size:9px;margin-top:6px;margin-bottom:3px;color:var(--text2)">${escHtml(section)}</div>`;
+        html += `<table class="cheat-table"><tbody>`;
+        rows.forEach(row => {
+          const cells = row.querySelectorAll("td");
+          if (cells.length >= 2) {
+            const c0 = highlightText(cells[0].innerHTML, q);
+            const c1 = highlightText(cells[1].innerHTML, q);
+            const cls1 = cells[1].className ? ` class="${cells[1].className}"` : "";
+            html += `<tr><td>${c0}</td><td${cls1}>${c1}</td></tr>`;
+          }
+        });
+        html += `</tbody></table>`;
+      }
+    }
+
+    searchInner.innerHTML = html;
+  });
+
+  function highlightText(html, q) {
+    // Only highlight text nodes (crude but sufficient for plain content)
+    return html.replace(new RegExp(`(${escRegex(q)})`, "gi"), "<mark>$1</mark>");
+  }
+
+  function escHtml(s) {
+    return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+
+  function escRegex(s) {
+    return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+</script>
+</body>
+</html>
