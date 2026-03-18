@@ -87,6 +87,7 @@ print(y)
 
 # 10. Create a variable `level` = 1. Reassign it to 99. Print both steps.
 level = 1
+print(level)
 level = 99
 print(level)
 
@@ -495,77 +496,138 @@ p1 = products[0]["price"]
 p2 = products[1]["price"]
 print(p1)
 print(p2)
-p1 = p2
+p1, p2 = p2, p1
 print(p1)
 print(p2)
 
 # 76. Unpack a student's grades into exactly 5 variables. Print each.
 #     Pick students[0] which has 5 grades.
-
+g1, g2, g3, g4, g5 = students[0]["grades"]
+print(g1, g2, g3, g4, g5)
 
 # 77. Create three variables from a string: first, second, third = "abc"
 #     Python can unpack strings too. Print them.
-
+first, second, third = "abc"
+print(first)
+print(second)
+print(third)
 
 # 78. Unpack the first order's values — id, userId, productId, quantity, total, status.
 #     Print each with a label.
+x = orders[0]
+id = x["id"]
+userId = x["userId"]
+productId = x["productId"]
+quantity = x["quantity"]
+total = x["total"]
+status = x["status"]
 
+print(f"id: {id}")
+print(f"userId: {userId}")
+print(f"productId: {productId}")
+print(f"quantity: {quantity}")
+print(f"total: {total}")
+print(f"status: {status}")
 
 # 79. Create x = 10. Then do: y = x. Change x to 99.
 #     Print both x and y. What happened to y?
 #     Note: integers are immutable — y keeps its original value.
-
+x = 10
+y = x
+x = 99
+print(x, y)
 
 # 80. Create a = [1, 2, 3]. Then do: b = a. Append 4 to a.
 #     Print both a and b. What happened?
 #     Note: lists are mutable — b and a point to the SAME list. This is a key Python gotcha.
-
-
+a = [1, 2, 3]
+b = a
+a.append(4)
+print(a)
+print(b)
 # =============================================================================
 # SECTION G — MIXED CHALLENGE (81–100)
 # =============================================================================
 
 # 81. Print the full name + salary of every admin user.
 #     Format: "Alice — $72000"
+for user in users:
+    role = user["role"]
+    if role == "admin":
+        name = user["name"]
+        salary = user["salary"]
+        print(f"{name:^5} - ${salary}")
 
 
 # 82. Count how many distinct types appear in this list:
 #     mixed = [1, "hello", 3.14, True, None, 42, "world", False]
 #     Hint: collect types in a list, then count unique ones.
+mixed = [1, "hello", 3.14, True, None, 42, "world", False]
+count = []
+for i in mixed:
+    count = list(set([*count, type(i)]))
 
-
+print(len(count))
 # 83. Print "Alice is active" or "Alice is inactive" for every user.
 #     Use f-string with the bool value of isActive.
-
-
+for u in users:
+    name = u["name"]
+    is_active = None
+    if u["isActive"]:
+        is_active = "active"
+    else:
+        is_active = "inactive"
+    print(f"{name} is {is_active}")
 # 84. Convert every student's grade list to a list of floats. Print results.
-
+for s in students:
+    s["grades"] = [float(g) for g in s["grades"]]
+    print(s["grades"])
 
 # 85. For each product, print:
 #     - name as uppercase
 #     - price as float
 #     - inStock converted to int (1 or 0)
-
+for p in products:
+    name = p["name"].upper()
+    price = float(p["price"])
+    inStock = int(p["inStock"])
+    print(f"{name:^15} {price:^5} {inStock}")
 
 # 86. Build a list of strings: each item is "id:name" for every user.
 #     Example: ["1:Alice", "2:Bob", ...]
 #     Use str() conversion in a loop.
-
+my_list = []
+for u in users:
+    id = u["id"]
+    name = u["name"]
+    my_list = [*my_list, f"{id}:{name}"]
+print(my_list)
 
 # 87. Print the type of every value inside users[0].
 #     Loop through users[0].values() and print type(v) for each.
 #     Syntax: dict.values()
-
+for v in users[0].values():
+    print(type(v))
 
 # 88. Find the user whose salary is closest to 50000.
 #     Hint: track a min_diff and best_user as you loop.
 #     Syntax: abs(x)  for absolute value
-
+min_diff = float("inf")
+best_user = None
+for u in users:
+    salary = u["salary"]
+    next_diff = abs(50000 - salary)
+    if next_diff < min_diff:
+        min_diff = next_diff
+        best_user = u
+print(min_diff, best_user)
 
 # 89. Print every order where total, when converted to str, starts with "1".
 #     Syntax: str(x).startswith("1")
 
-
+for o in orders:
+    if str(o["total"]).startswith("1"):
+        print(o)
 # 90. Create a variable `summary` that is a multiline f-string summarizing:
 #     - total number of users
 #     - total number of products
@@ -576,52 +638,89 @@ print(p2)
 #       Users: {len(users)}
 #       ...
 #       """
-
+summary = f"Users: {len(users)}\nProducts: {len(products)}\nOrders: {len(orders)}"
+print(summary)
 
 # 91. For each user, determine their tax bracket based on salary:
 #     > 80000 → "High"
 #     > 50000 → "Mid"
 #     else    → "Low"
 #     Store each result as a string, print "Alice: High" etc.
+template = "{n}: {t}"
+for u in users:
+    name = u["name"]
+    salary = u["salary"]
+    if salary > 80000:
+        print(template.format(n=name, t="High"))
+    elif salary > 50000:
+        print(template.format(n=name, t="Mid"))
+    else:
+        print(template.format(n=name, t="Low"))
 
 
 # 92. Convert all user salaries to floats and print the average.
 #     Do the sum manually with a for loop.
-
-
+total = 0
+for u in users:
+    salary = float(u["salary"])
+    total += salary
+print(total / len(users))
 # 93. For each product, print whether its price is an integer or has decimals.
 #     Hint: price % 1 == 0 means no decimals.
 #     Syntax: x % 1   (modulo)
+for p in products:
+    price = p["price"]
+    if isinstance(price, int) or price % 1:
+        print(price)
 
 
 # 94. Build a string that lists all product names separated by ", ".
 #     Do NOT use join() — manually build it in a loop.
 #     Hint: handle the trailing comma carefully.
-
-
+list = []
+for p in products:
+    name = p["name"]
+    list = [*list, name]
+print(", ".join(list))
 # 95. Print the name and type of every field in products[0].
 #     Loop through products[0].items().
 #     Syntax: for key, value in dict.items():
-
+for k, v in products[0].items():
+    print(f"{k}: {v}")
 
 # 96. Check if all users have salaries above 30000.
 #     Use a for loop and a flag variable `all_above = True`.
 #     If any salary fails, set flag to False and break.
 #     Print the flag.
-
-
+all_above = True
+for u in users:
+    salary = u["salary"]
+    if salary <= 30000:
+        all_above = False
+        break
+print(all_above)
 # 97. Find and print the name of the youngest user without using min() or sort().
-
-
+youngest_age = float("inf")
+youngest = None
+for u in users:
+    age = u["age"]
+    if age < youngest_age:
+        youngest_age = age
+        youngest = u
+print(youngest)
 # 98. Build a dict where keys are user IDs and values are their names.
 #     { 1: "Alice", 2: "Bob", ... }
 #     Use a for loop.
 #     Syntax: d = {}   then   d[key] = value
+d = {u["id"]: u["name"] for u in users}
+print(d)
 
 
 # 99. Print every user's name repeated salary//10000 times.
 #     Example: Alice (72000 salary) → "Alice Alice Alice Alice Alice Alice Alice"
 #     Syntax: "word " * n
+for u in users:
+    print(u["name"] * (u["salary"] // 10000))
 
 
 # 100. BOSS DRILL
@@ -632,3 +731,59 @@ print(p2)
 #      - Total revenue (sum of all order totals)
 #      Format it neatly using a multiline f-string.
 #      All values must be computed from the data — no hardcoding.
+total_users = len(users)
+active_count = 0
+inactive_count = 0
+for u in users:
+    isActive = u["isActive"]
+    if isActive:
+        active_count += 1
+    else:
+        inactive_count += 1
+
+total_products = len(products)
+in_stock = 0
+out_of_stock = 0
+for p in products:
+    inStock = p["inStock"]
+    if inStock:
+        in_stock += 1
+    else:
+        out_of_stock += 1
+
+total_orders = len(orders)
+completed = 0
+pending = 0
+total_revenue = 0
+for o in orders:
+    total = o["total"]
+    status = o["status"]
+    total_revenue += total
+    if status == "completed":
+        completed += 1
+    elif status == "pending":
+        pending += 1
+report = f"""
+=============================
+        DATA REPORT
+=============================
+USERS
+  Total:    {total_users}
+  Active:   {active_count}
+  Inactive: {inactive_count}
+
+PRODUCTS
+  Total:        {total_products}
+  In-Stock:     {in_stock}
+  Out-of-Stock: {out_of_stock}
+
+ORDERS
+  Total:     {total_orders}
+  Completed: {completed}
+  Pending:   {pending}
+  
+  TOTAL REVENUE: ${total_revenue:.2f}
+=============================
+"""
+
+print(report)

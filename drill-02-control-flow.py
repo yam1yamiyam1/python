@@ -1,9 +1,10 @@
 import os
+import random
 import sys
 
-sys.path.insert(
-    0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data")
-)
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "data"))
+from training_data import numbers, orders, products, students, users
+
 # =============================================================================
 # DRILL 02 — CONTROL FLOW
 # Comparison operators, logical operators, if/elif/else,
@@ -49,7 +50,7 @@ sys.path.insert(
 
 # 1. Print True if users[0]["age"] is greater than 30.
 
-print(users[0])
+
 # 2. Print True if products[0]["price"] is exactly 120.
 
 
@@ -184,14 +185,20 @@ print(users[0])
 
 # 36. Use a TERNARY (one-liner if/else) to print "Adult" or "Minor" for each user.
 #     Syntax: result = "Adult" if age >= 18 else "Minor"
+for u in users:
+    age = u["age"]
+    print("Adult" if age >= 18 else "Minor")
 
 
 # 37. For each product, use ternary to print "Available" or "Unavailable".
-
+for p in products:
+    inStock = p["inStock"]
+    print("Available" if inStock else "Unavailable")
 
 # 38. For each order, use ternary to label total as "Expensive" (>150) or "Cheap".
-
-
+for o in orders:
+    total = o["total"]
+    print("Expensive" if total > 150 else "Cheap")
 # 39. Print whether the number of active users is more, less, or equal to inactive users.
 #     Compute both counts first.
 
@@ -273,34 +280,43 @@ print(users[0])
 
 # 53. Print the index and name of every user using enumerate().
 #     Format: "0 → Alice"
-
+for i, u in enumerate(users):
+    print(f"{i} → {u['name']}")
 
 # 54. Print a 1-indexed list of all products.
 #     Format: "1. Iron Sword"
 #     Syntax: enumerate(collection, start=1)
-
+my_list = [f"{i}. {p['name']}" for i, p in enumerate(products, start=1)]
+print(my_list)
 
 # 55. Use range() to print numbers 1 through 10.
 #     Syntax: for i in range(1, 11):
-
+for i in range(1, 11):
+    print(i)
 
 # 56. Use range() to print even numbers from 2 to 20.
 #     Syntax: range(start, stop, step)
+for i in range(2, 21, 2):
+    print(i)
 
 
 # 57. Use range() to count DOWN from 10 to 1.
 #     Syntax: range(10, 0, -1)
-
+for i in range(10, 0, -1):
+    print(i)
 
 # 58. Loop through users and products at the same time using zip().
 #     Print: "Alice owns Iron Sword"
 #     Syntax: for user, product in zip(users, products):
-
+for u, p in zip(users, products):
+    print(f"{u['name']} owns {p['name']}")
 
 # 59. Build a list of all user names using a for loop + append.
 #     Print the final list.
-
-
+my_list = []
+for u in users:
+    my_list.append(u["name"])
+print(my_list)
 # 60. Build a list of all product prices doubled. Print it.
 
 
@@ -396,75 +412,166 @@ print(users[0])
 # 81. Search users for role "superadmin".
 #     Found → print "Found: {name}" and break.
 #     Not found → the else block prints "No superadmin."
-
+for u in users:
+    if u["role"] == "superadmin":
+        print(f"Found: {u['name']}")
+        break
+else:
+    print("No superadmin.")
 
 # 82. Search products for a price above 500.
 #     Found → print "Expensive product: {name}".
 #     Not found → else prints "All products under $500."
-
+for p in products:
+    if p["price"] > 500:
+        print(f"Expensive product: {p['name']}")
+        break
+else:
+    print("All products under $500")
 
 # 83. Search orders for total above 1000.
 #     Use for..else.
-
+for o in orders:
+    if o["total"] > 1000:
+        print(f"Order Id: {o['id']}")
+        break
+else:
+    print("No order above $1000")
 
 # 84. Search students for an average grade above 99.
 #     Use for..else.
-
+for s in students:
+    total_grades = 0
+    grades = s["grades"]
+    for g in grades:
+        total_grades += g
+    average_grade = total_grades / len(grades)
+    if average_grade > 99:
+        print(f"Name: {s['name']}")
+        break
+else:
+    print("No student has higher grade than 99")
 
 # 85. Search users for an inactive admin.
 #     (isActive == False AND role == "admin")
 #     Use for..else.
-
+for u in users:
+    if not u["isActive"] and u["role"] == "admin":
+        print(f"Inactive Admin: {u['name']}")
+        break
+else:
+    print("There is no inactive admin.")
 
 # 86. Search products for a product named exactly "Magic Staff".
 #     Use for..else.
-
+for p in products:
+    if p["name"] == "Magic Staff":
+        print(f"{p['name']} found")
+        break
+else:
+    print("No Magic Staff found.")
 
 # 87. Search numbers for any number divisible by 7.
 #     Found → print it and break.
 #     Else → "None divisible by 7."
-
+for i in numbers:
+    if i % 7 == 0:
+        print(f"{i} is the first divisible by 7")
+        break
+else:
+    print("None divisible by 7.")
 
 # 88. Search orders for a "shipped" order with total > 300.
 #     Use for..else.
-
+for o in orders:
+    if o["status"] == "shipped" and o["total"] > 300:
+        print(f"OrderId: {o['id']} has been shipped with a total greater than 300")
+        break
+else:
+    print("No order with a total greater than 100 is shipped")
 
 # =============================================================================
 # SECTION G — WHILE LOOPS (89–96)
 # =============================================================================
 
 # 89. Print numbers 1 to 5 using a while loop.
+count = 0
+while count < 5:
+    count += 1
+    print(count)
 
 
 # 90. Start at 100. Keep subtracting 13 until the value goes below 0.
 #     Print each value. Count how many subtractions it took.
-
-
+value = 100
+sub_count = 0
+while value > 0:
+    value -= 13
+    sub_count += 1
+    if value > 0:
+        print(value)
+print(sub_count)
 # 91. Use a while loop to walk through all users and print their names.
 #     Use an index variable `i = 0`.
-
+i = 0
+while i < len(users):
+    print(users[i]["name"])
+    i += 1
 
 # 92. Use a while loop to find the first product with price below 30.
 #     Print its name and break.
+i = 0
+while i < len(products):
+    if products[i]["price"] < 30:
+        print(f"{products[i]['name']} - {products[i]['price']}")
+        break
+    i += 1
+else:
+    print("No product priced below 30")
 
 
 # 93. Simulate a game loop: start with hp = 100.
 #     Each iteration subtract a random damage between 10 and 20.
 #     Print hp after each hit. Stop when hp <= 0. Print "Dead!"
 #     Syntax: import random   then   random.randint(10, 20)
+hp = 100
+while hp > 0:
+    hp -= random.randint(10, 20)
+    if hp <= 0:
+        print("Dead!")
+    else:
+        print(hp)
 
 
 # 94. Use a while loop to count how many orders have totals above 150.
 #     Stop as soon as you've counted 3 such orders. Print the count.
+threshold = 150
+above_count = 0
+i = 0
+while i < len(orders):
+    if orders[i]["total"] > threshold:
+        above_count += 1
+        if above_count == 3:
+            break
+    i += 1
+print(above_count)
 
 
 # 95. Walk through `numbers` with a while loop. Accumulate a product (multiply).
 #     Print the running product after each step.
-
+i = 0
+num_products = 1
+while i < len(numbers):
+    num_products *= numbers[i]
+    print(num_products)
+    i += 1
 
 # 96. Use a while loop + index to print every other user (0, 2, 4...).
 #     Syntax: i += 2
-
+i = 0
+while i < len(users):
+    print(users[i])
+    i += 2
 
 # =============================================================================
 # SECTION H — MIXED CHALLENGE (97–100)
@@ -474,6 +581,14 @@ print(users[0])
 #     For each user, loop through all orders to find their orders.
 #     Print: "Alice has 2 orders totalling $300"
 #     Compute total per user by accumulating inside the inner loop.
+for u in users:
+    total = 0
+    order_count = 0
+    for o in orders:
+        if u["id"] == o["userId"]:
+            total += o["total"]
+            order_count += 1
+    print(f"{u['name']:^5} has {order_count} orders totalling ${total}")
 
 
 # 98. FizzBuzz 1–30 using a while loop (not for).
@@ -482,12 +597,27 @@ print(users[0])
 #     Divisible by 5       → "Buzz"
 #     Else                 → the number
 
+i = 1
+while i <= 30:
+    if i % 3 == 0 and i % 5 == 0:
+        print("FizzBuzz")
+    elif i % 3 == 0:
+        print("Fizz")
+    elif i % 5 == 0:
+        print("Buzz")
+    else:
+        print(i)
+    i += 1
 
 # 99. Loop through products. Build TWO lists in one pass:
 #     `cheap` → price < 100
 #     `expensive` → price >= 100
 #     Print both lists at the end.
 
+cheap = [p["name"] for p in products if p["price"] < 100]
+expensive = [p["name"] for p in products if p["price"] >= 100]
+print(cheap)
+print(expensive)
 
 # 100. BOSS DRILL
 #      Loop through all users (outer loop).
@@ -499,3 +629,28 @@ print(users[0])
 #         - Leather Armor x1 ($60) — completed"
 #      Use for..else on the inner loop to print "  No orders." if the user
 #      had no orders at all.
+for user in users:
+    user_order = []
+
+    print(f"{user['name']}:")
+
+    for order in orders:
+        if user["id"] == order["userId"]:
+            for product in products:
+                if order["productId"] == product["id"]:
+                    orderAdd = {
+                        "id": order["id"],
+                        "product_name": product["name"],
+                        "quantity": order["quantity"],
+                        "total": order["total"],
+                        "status": order["status"],
+                    }
+                    user_order.append(orderAdd)
+
+    if not user_order:
+        print("  No order")
+    else:
+        for i in user_order:
+            print(
+                f"  - {i['product_name']} x{i['quantity']} (${i['total']}) - {i['status']}"
+            )
