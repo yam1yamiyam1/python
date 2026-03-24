@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "data"))
 from training_data import numbers, orders, products, students, users
@@ -528,15 +529,30 @@ print([(u["name"], u["salary"]) for u in sorted(users, key=lambda x: -x["salary"
 #     new syn: d[(key1, key2)] = value
 #
 #   output: {('admin', True): 2, ('user', False): 2, ...}
-
+d = {}
+for u in users:
+    key = (u["role"], u["isActive"])
+    d[key] = d.get(key, 0) + 1
+print(d)
 
 # 60. Demonstrate that tuples are faster to create than lists.
 #     Create both 1000 times using a loop, time each with time.time().
 #     new syn: import time  /  time.time()
 #
 #   output: tuple time: ...  list time: ...  (tuples should be faster)
+start_time_list = time.time()
+for _ in range(1000):
+    my_list = [1, 2, 3, 4, 5]
+end_time_list = time.time()
+list_time = end_time_list - start_time_list
 
-
+start_time_tuple = time.time()
+for _ in range(1000):
+    my_tuple = (1, 2, 3, 4, 5)
+end_time_tuple = time.time()
+tuple_time = end_time_tuple - start_time_tuple
+print(list_time)
+print(tuple_time)
 # =============================================================================
 # SECTION E — SETS (61–75)
 # =============================================================================
@@ -545,24 +561,25 @@ print([(u["name"], u["salary"]) for u in sorted(users, key=lambda x: -x["salary"
 #     new syn: set(lst)  or  {a, b, c}
 #
 #   output: {'weapon', 'armor', 'potion'}  (order may vary)
-
+categories = set(p["category"] for p in products)
 
 # 62. Create a set of all order statuses. Print it.
 #
 #   output: {'completed', 'pending', 'shipped'}
-
+print(set(o["status"] for o in orders))
 
 # 63. Check if "weapon" is in the categories set.
 #     new syn: x in s
 #
 #   output: True
-
+print("weapon" in categories)
 
 # 64. Add "consumable" to the categories set. Print it.
 #     new syn: s.add(value)
 #
 #   output: {'weapon', 'armor', 'potion', 'consumable'}
-
+categories.add("consumable")
+print(categories)
 
 # 65. Remove "consumable" from the set using remove(). Print it.
 #     Then try to remove "missing" using discard() — no error.
@@ -570,18 +587,21 @@ print([(u["name"], u["salary"]) for u in sorted(users, key=lambda x: -x["salary"
 #              s.discard(x) ← silent if missing
 #
 #   output: {'weapon', 'armor', 'potion'}
-
+categories.remove("consumable")
+print(categories)
+categories.discard("consumable")
+print(categories)
 
 # 66. Deduplicate this list using a set, then convert back to a sorted list:
 #     dupes = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5]
 #
 #   output: [1, 2, 3, 4, 5, 6, 9]
-
-
+dupes = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5]
+print(list(set(dupes)))
 # 67. Get all unique user roles as a sorted list.
 #
 #   output: ['admin', 'moderator', 'user']
-
+print(list(set(u["role"] for u in users)))
 
 # 68. Get the UNION of these two sets:
 #     a = {1, 2, 3, 4}
@@ -589,51 +609,55 @@ print([(u["name"], u["salary"]) for u in sorted(users, key=lambda x: -x["salary"
 #     new syn: a | b  or  a.union(b)
 #
 #   output: {1, 2, 3, 4, 5, 6}
-
-
+a = {1, 2, 3, 4}
+b = {3, 4, 5, 6}
+print(a.union(b))
 # 69. Get the INTERSECTION of sets a and b from #68.
 #     new syn: a & b  or  a.intersection(b)
 #
 #   output: {3, 4}
-
+print(a.intersection(b))
 
 # 70. Get the DIFFERENCE a - b from #68 (in a but not b).
 #     new syn: a - b  or  a.difference(b)
 #
 #   output: {1, 2}
-
+print(a.difference(b))
 
 # 71. Get the SYMMETRIC DIFFERENCE of a and b (in one but not both).
 #     new syn: a ^ b  or  a.symmetric_difference(b)
 #
 #   output: {1, 2, 5, 6}
-
+print(a ^ b)
 
 # 72. Check if {1, 2} is a subset of {1, 2, 3, 4}.
 #     new syn: a.issubset(b)  or  a <= b
 #
 #   output: True
 
-
+print({1, 2} <= a)
 # 73. Check if {1, 2, 3, 4} is a superset of {2, 3}.
 #     new syn: a.issuperset(b)  or  a >= b
 #
 #   output: True
-
+print(a >= {2, 3})
 
 # 74. Find users who have placed orders AND are active.
 #     Hint: build a set of userIds from orders, build a set of ids of active users.
 #           Use intersection to find the overlap.
 #
 #   output: set of user ids who are both active and have orders
-
-
+order_user_ids = set(o["userId"] for o in orders)
+active_user_ids = set(u["id"] for u in users if u["isActive"])
+print(order_user_ids.intersection(active_user_ids))
 # 75. Find product ids that appear in orders but are out of stock.
 #     Hint: set of productIds from orders, set of ids of out-of-stock products.
 #           Use intersection.
 #
 #   output: set of product ids
-
+order_product_ids = set(o["productId"] for o in orders)
+no_stock_product_ids = set(p["id"] for p in products if not p["inStock"])
+print(order_product_ids & no_stock_product_ids)
 
 # =============================================================================
 # SECTION F — STACKS (76–85)
@@ -648,20 +672,24 @@ print([(u["name"], u["salary"]) for u in sorted(users, key=lambda x: -x["salary"
 #
 #   output: ['Iron Sword', 'Steel Shield', ..., 'Elven Cloak']
 
-
+stack = []
+for p in products:
+    stack.append(p["name"])
+print(stack)
 # 77. Peek at the top of the stack (without removing). Print it.
 #     new syn: stack[-1]
 #
 #   output: Elven Cloak
-
+print(stack[-1])
 
 # 78. Pop 3 items from the stack. Print each popped value.
 #
 #   output: Elven Cloak
 #           War Axe
 #           Mana Potion
-
-
+for i in range(3):
+    print(stack.pop(-i))
+print(stack)
 # 79. Check if the stack is empty.
 #     new syn: len(stack) == 0  or  not stack
 #
