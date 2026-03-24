@@ -1299,7 +1299,7 @@ print(list(map(lambda x: x["name"], sorted(users, key=lambda x: -x["salary"])[:3
 #   fn:       my_map(func, collection)
 #   vars:     result (list), item (loop var)
 #   behavior: apply func to every item and return a new list
-#   call:     print(my_map(lambda p: p["name"], products))
+#   call:     print(my_map(func that returns p["name"], products))
 #   output:   ['Iron Sword', 'Steel Shield', 'Health Potion', ...]
 def my_map(func, collection):
     return list(func(item) for item in collection)
@@ -1312,7 +1312,7 @@ print(my_map(lambda p: p["name"], products))
 #   fn:       my_filter(predicate, collection)
 #   vars:     result (list), item (loop var), in_stock
 #   behavior: keep only items where predicate returns True
-#   call:     in_stock = my_filter(lambda p: p["inStock"], products)
+#   call:     in_stock = my_filter(func that returns p["inStock"], products)
 #             print([p["name"] for p in in_stock])
 #   output:   ['Iron Sword', 'Steel Shield', 'Health Potion', ...]
 def my_filter(predicate, collection):
@@ -1327,7 +1327,7 @@ print(my_map(lambda p: p["name"], in_stock))
 #   fn:       my_reduce(func, collection, initial)
 #   vars:     result (starts as initial, updated each step), item (loop var)
 #   behavior: fold a list into one value by running func(result, item) each step
-#   call:     print(my_reduce(lambda acc, o: acc + o["total"], orders, 0))
+#   call:     print(my_reduce(func that adds o["total"] to acc, orders, 0))
 #   output:   1085
 def my_reduce(func, collection, initial):
     result = initial
@@ -1342,7 +1342,7 @@ print(my_reduce(lambda acc, o: acc + o["total"], orders, 0))
 #   vars:     winner (dict)
 #   behavior: use my_reduce to find the user with the highest salary
 #             initial = users[0]
-#   call:     winner = my_reduce(lambda best, u: u if u["salary"] > best["salary"] else best, users, users[0])
+#   call:     winner = my_reduce(func that returns whichever user has higher salary, users, users[0])
 #             print(winner["name"])
 #   output:   David
 winner = my_reduce(
@@ -1354,31 +1354,37 @@ print(winner["name"])
 # H12.
 #   fn:       apply_to_all(collection, *funcs)
 #   behavior: apply every func to every item, returns a list of lists
-#   call:     print(apply_to_all(users, lambda u: u["name"], lambda u: u["salary"]))
+#   call:     print(apply_to_all(users, func that gets name, func that gets salary))
 #   output:   [['Alice', 72000], ['Bob', 38000], ...]
 def apply_to_all(collection, *funcs):
-    result = []
-    for item in collection:
-        item_result = []
-        for func in funcs:
-            item_result.append(func(item))
-        result.append(item_result)
-    return result
+    return [[func(item) for func in funcs] for item in collection]
 
 
 print(apply_to_all(users, lambda u: u["name"], lambda u: u["salary"]))
+
 
 # H13.
 #   fn:       compose(f, g)
 #   vars:     get_salary_str, get_upper_name
 #   behavior: make a function where g runs first on input, then f runs on g's result
 #             fn(x) = f(g(x))
-#   call:     get_salary_str = compose(lambda x: f"${x}", lambda u: u["salary"])
-#             get_upper_name = compose(str.upper, lambda u: u["name"])
+#   call:     get_salary_str = compose(func that formats as "$n", func that gets salary)
+#             get_upper_name = compose(func that uppercases, func that gets name)
 #             print(get_salary_str(users[0]))
 #             print(get_upper_name(users[0]))
 #   output:   $72000
 #             ALICE
+def compose(f, g):
+    def wrapper(x):
+        return f(g(x))
+
+    return wrapper
+
+
+get_salary_str = compose(lambda x: f"${x}", lambda u: u["salary"])
+get_upper_name = compose(str.upper, lambda u: u["name"])
+print(get_salary_str(users[0]))
+print(get_upper_name(users[0]))
 
 
 # H14.
@@ -1386,14 +1392,28 @@ print(apply_to_all(users, lambda u: u["name"], lambda u: u["salary"]))
 #   vars:     get_after_tax
 #   behavior: make a function that chains N functions — output of each feeds into next
 #   call:     get_after_tax = compose_all(
-#                 lambda u: u["salary"],
-#                 lambda s: s * 0.8,
-#                 lambda s: f"${round(s)}"
+#                 func that gets salary,
+#                 func that multiplies by 0.8,
+#                 func that formats as "$n"
 #             )
 #             for u in users: print(f"{u['name']}: {get_after_tax(u)}")
 #   output:   Alice: $57600
 #             Bob: $30400
 #             ...
+def compose_all(*funcs):
+    def wrapper(x):
+        for func in funcs:
+            x = func(x)
+        return x
+
+    return wrapper
+
+
+get_after_tax = compose_all(
+    lambda u: u["salary"], lambda s: s * 0.8, lambda s: f"${round(s)}"
+)
+for u in users:
+    print(f"{u['name']}: {get_after_tax(u)}")
 
 
 # H15.
@@ -1401,9 +1421,19 @@ print(apply_to_all(users, lambda u: u["name"], lambda u: u["salary"]))
 #   vars:     result
 #   behavior: pass a value through each func in order and return the final result
 #             like compose_all but you pass data in directly instead of getting a fn back
-#   call:     result = pipe(users[0]["salary"], lambda x: x*0.8, lambda x: round(x), lambda x: f"${x}")
+#   call:     result = pipe(users[0]["salary"], func * 0.8, func round, func format "$n")
 #             print(result)
 #   output:   $57600
+def pipe(value, *funcs):
+    for func in funcs:
+        value = func(value)
+    return value
+
+
+result = pipe(
+    users[0]["salary"], lambda x: x * 0.8, lambda x: round(x), lambda x: f"${x}"
+)
+print(result)
 
 
 # H16.
@@ -1411,11 +1441,20 @@ print(apply_to_all(users, lambda u: u["name"], lambda u: u["salary"]))
 #   vars:     result (dict), key (loop var), groups
 #   new syn:  result.setdefault(key, [])  creates empty list for key if not there yet
 #   behavior: group items into lists by the value returned from key_func
-#   call:     groups = group_by(users, lambda u: u["role"])
+#   call:     groups = group_by(users, func that gets role)
 #             for role, members in groups.items(): print(f"{role}: {len(members)}")
 #   output:   admin: 2
 #             user: 4
 #             moderator: 2
+def group_by(collection, key_func):
+    result = {}
+    for item in collection:
+        result.setdefault(key_func(item), []).append(item)
+    return result
+
+
+groups = group_by(users, lambda x: x["role"])
+print(list(f"{k}: {len(v)}" for k, v in groups.items()))
 
 
 # H17.
@@ -1423,17 +1462,29 @@ print(apply_to_all(users, lambda u: u["name"], lambda u: u["salary"]))
 #   vars:     result (list), all_grades
 #   new syn:  result.extend(other_list)  adds each element (not the list itself)
 #   behavior: apply func to each item (func returns a list), flatten all into one list
-#   call:     all_grades = flat_map(students, lambda s: s["grades"])
+#   call:     all_grades = flat_map(students, func that gets grades list)
 #             print(all_grades)
 #   output:   [88, 92, 79, 95, 84, 72, 68, 75, ...]
+def flat_map(collection, func):
+    return list(g for item in collection for g in func(item))
+
+
+all_grades = flat_map(students, lambda x: x["grades"])
+print(all_grades)
 
 
 # H18.
 #   fn:       zip_with(func, list_a, list_b)
 #   new syn:  for a, b in zip(list_a, list_b)
 #   behavior: pair up items from two lists and apply a two-arg func to each pair
-#   call:     print(zip_with(lambda u, o: f"{u['name']} — ${o['total']}", users, orders))
+#   call:     print(zip_with(func that builds "name — $total" string, users, orders))
 #   output:   ['Alice — $240', 'Bob — $125', ...]
+def zip_with(func, la, lb):
+    return list(func(a, b) for a, b in zip(la, lb))
+
+
+result = zip_with(lambda a, b: f"{a['name']} - ${b['total']}", users, orders)
+print(result)
 
 
 # H19.
@@ -1441,20 +1492,42 @@ print(apply_to_all(users, lambda u: u["name"], lambda u: u["salary"]))
 #   vars:     yes (list), no (list), active, inactive
 #   behavior: split a list into two in one pass — matching and not matching
 #             returns a tuple (yes, no)
-#   call:     active, inactive = partition(users, lambda u: u["isActive"])
+#   call:     active, inactive = partition(users, func that checks isActive)
 #             print([u["name"] for u in active])
 #             print([u["name"] for u in inactive])
 #   output:   ['Alice', 'Carol', 'David', 'Frank', 'Grace']
 #             ['Bob', 'Eve', 'Hank']
+def partition(collection, predicate):
+    yes = []
+    no = []
+    for item in collection:
+        if predicate(item):
+            yes.append(item)
+        else:
+            no.append(item)
+    return yes, no
+
+
+active, inactive = partition(users, lambda x: x["isActive"])
+print(list(u["name"] for u in active))
+print(list(u["name"] for u in inactive))
 
 
 # H20.
 #   fn:       find_first(collection, predicate)
 #   behavior: return the first item where predicate is True, or None if nothing matches
-#   call:     print(find_first(users, lambda u: u["role"] == "admin"))
-#             print(find_first(products, lambda p: p["price"] > 150))
+#   call:     print(find_first(users, func that checks role == "admin"))
+#             print(find_first(products, func that checks price > 150))
 #   output:   {'id': 1, 'name': 'Alice', ...}
 #             {'id': 4, 'name': 'Dragon Bow', ...}
+def find_first(collection, predicate):
+    for item in collection:
+        if predicate(item):
+            return item
+
+
+print(find_first(users, lambda x: x["role"] == "admin"))
+print(find_first(products, lambda x: x["price"] > 150))
 
 
 # H21.
@@ -1462,10 +1535,20 @@ print(apply_to_all(users, lambda u: u["name"], lambda u: u["salary"]))
 #   vars:     result (dict), key (loop var)
 #   new syn:  result.get(key, 0)  returns 0 if key not in dict yet
 #   behavior: count how many items fall into each group
-#   call:     print(count_by(users, lambda u: u["role"]))
-#             print(count_by(orders, lambda o: o["status"]))
+#   call:     print(count_by(users, func that gets role))
+#             print(count_by(orders, func that gets status))
 #   output:   {'admin': 2, 'user': 4, 'moderator': 2}
 #             {'completed': 5, 'pending': 3, 'shipped': 2}
+def count_by(collection, key_func):
+    result = {}
+    for item in collection:
+        key = key_func(item)
+        result[key] = result.get(key, 0) + 1
+    return result
+
+
+print(count_by(users, lambda x: x["role"]))
+print(count_by(orders, lambda x: x["status"]))
 
 
 # H22.
@@ -1474,11 +1557,24 @@ print(apply_to_all(users, lambda u: u["name"], lambda u: u["salary"]))
 #   new syn:  key=lambda x: tuple(f(x) for f in key_funcs)
 #   behavior: sort by multiple keys in priority order
 #             first key sorts first, second key breaks ties
-#   call:     result = sort_by(users, lambda u: u["role"], lambda u: u["salary"], reverse=True)
+#   call:     result = sort_by(users, func that gets role, func that gets salary, reverse=True)
 #             for u in result: print(f"{u['name']} | {u['role']} | ${u['salary']}")
 #   output:   David | admin | $95000
 #             Alice | admin | $72000
 #             ...
+def sort_by(collection, *key_funcs, reverse=False):
+    return list(
+        sorted(
+            collection,
+            key=lambda x: tuple(func(x) for func in key_funcs),
+            reverse=reverse,
+        )
+    )
+
+
+result = sort_by(users, lambda x: x["salary"], lambda x: x["role"], reverse=True)
+for u in result:
+    print(f"{u['name']:^5} | {u['role']:^10} | ${u['salary']}")
 
 
 # H23.
@@ -1488,9 +1584,8 @@ print(apply_to_all(users, lambda u: u["name"], lambda u: u["salary"]))
 #   behavior:  make a function that caches results — same input never reruns func
 #   call:      call_count = 0
 #              def get_user_orders(user_id):
-#                  global call_count
-#                  call_count += 1
-#                  return [o for o in orders if o["userId"] == user_id]
+#                  increment call_count
+#                  return orders where o["userId"] == user_id
 #              cached = memoize(get_user_orders)
 #              cached(1); print(call_count)
 #              cached(1); print(call_count)
@@ -1498,6 +1593,39 @@ print(apply_to_all(users, lambda u: u["name"], lambda u: u["salary"]))
 #   output:    1
 #              1
 #              2
+def memoize(func):
+    cache = {}
+
+    def wrapper(x):
+        if x in cache:
+            return cache[x]
+        else:
+            answer = func(x)
+            cache[x] = answer
+            return answer
+
+    return wrapper
+
+
+call_count = 0
+
+
+def get_user_orders(user_id):
+    global call_count
+    call_count += 1
+    return [o for o in orders if o["userId"] == user_id]
+
+
+cached = memoize(get_user_orders)
+
+cached(1)
+print(f"Call count after first request for User 1: {call_count}")
+
+cached(2)
+print(f"Call count after first request for User 2: {call_count}")
+
+cached(1)
+print(f"Call count after second request for User 1: {call_count}")
 
 
 # H24.
@@ -1508,13 +1636,36 @@ print(apply_to_all(users, lambda u: u["name"], lambda u: u["salary"]))
 #             returns fallback if all attempts fail
 #   call:     attempt = 0
 #             def flaky():
-#                 global attempt
-#                 attempt += 1
-#                 if attempt < 3: raise ValueError("not yet")
-#                 return "success"
+#                 increment attempt
+#                 raise on first 2 calls, return "success" on 3rd
 #             safe = retry(flaky, times=5, fallback="gave up")
 #             print(safe())
 #   output:   success
+def retry(func, times=3, fallback=None):
+    def wrapper():
+        for attempt in range(times):
+            try:
+                return func()
+            except Exception:
+                pass
+        return fallback
+
+    return wrapper
+
+
+attempt = 0
+
+
+def flaky():
+    global attempt
+    attempt += 1
+    if attempt <= 2:
+        raise Exception("Failed!")
+    return "success"
+
+
+safe = retry(flaky, times=5, fallback="gave up")
+print(safe())
 
 
 # =============================================================================
