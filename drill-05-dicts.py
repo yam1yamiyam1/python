@@ -378,31 +378,52 @@ print({role: [u["name"] for u in users if u["role"] == role] for role in unique_
 #
 #   output: {'Alice': 300, 'Bob': 315, 'Carol': 255, 'David': 270, 'Eve': 100,
 #            'Frank': 120, 'Grace': 85, 'Hank': 0}
-
+print(
+    {
+        u["name"]: sum([o["total"] for o in orders if o["userId"] == u["id"]])
+        for u in users
+    }
+)
 
 # 42. Use a dict comprehension to build a price lookup: {product_id: price}.
 #     Then use it to calculate the total value of all orders without looping over products.
 #
 #   output: price_lookup then total order value
-
-
+product_lookup = {p["id"]: p["price"] for p in products}
+print(sum([product_lookup.get(o["productId"], 0) * o["quantity"] for o in orders]))
 # 43. Use a dict comprehension to flag products that need restocking:
 #     {name: True if quantity < 5 else False}
 #
 #   output: {'Iron Sword': False, 'Dragon Bow': True, ...}
-
+print({p["name"]: p["quantity"] < 5 for p in products})
 
 # 44. Use a dict comprehension to map (role, isActive) tuple → list of names.
 #     Hint: get unique combos first, then filter.
 #
 #   output: {('admin', True): ['Alice', 'David'], ('user', False): ['Bob', 'Eve', 'Hank'], ...}
-
+unique_active_roles = set((u["role"], u["isActive"]) for u in users)
+print(
+    {
+        tuple_key: [u["name"] for u in users if (u["role"], u["isActive"]) == tuple_key]
+        for tuple_key in unique_active_roles
+    }
+)
 
 # 45. Use a nested dict comprehension to build:
 #     {user_name: {order_id: total}} for each user's orders.
 #
 #   output: {'Alice': {1: 240, 3: 60}, 'Bob': {2: 125, 7: 190}, ...}
-
+username_lookup = {u["id"]: u["name"] for u in users}
+unique_user_orders = set(o["userId"] for o in orders)
+print(unique_user_orders)
+print(
+    {
+        username_lookup.get(user_id): {
+            o["id"]: o["total"] for o in orders if o["userId"] == user_id
+        }
+        for user_id in unique_user_orders
+    }
+)
 
 # =============================================================================
 # SECTION D — NESTED DICTS (46–60)
@@ -413,13 +434,34 @@ print({role: [u["name"] for u in users if u["role"] == role] for role in unique_
 #
 #   output: {1: {'name': 'Alice', 'order_count': 2}, 2: {'name': 'Bob', 'order_count': 2}, ...}
 
+print(
+    {
+        u["id"]: {
+            "name": u["name"],
+            "order_count": sum(1 for o in orders if u["id"] == o["userId"]),
+        }
+        for u in users
+    }
+)
 
 # 47. Build a nested dict: {category: {"count": n, "total_value": sum(price*quantity)}}
 #     for products grouped by category.
 #
 #   output: {'weapon': {'count': 3, 'total_value': ...}, ...}
-
-
+unique_categories = set(p["category"] for p in products)
+print(
+    {
+        category: {
+            "count": sum(1 for p in products if p["category"] == category),
+            "total_value": sum(
+                p["price"] * p["quantity"]
+                for p in products
+                if p["category"] == category
+            ),
+        }
+        for category in unique_categories
+    }
+)
 # 48. Access a deeply nested value safely using .get() chaining.
 #     data = {"user": {"profile": {"name": "Alice"}}}
 #     Get data["user"]["profile"]["name"] safely.
@@ -427,7 +469,8 @@ print({role: [u["name"] for u in users if u["role"] == role] for role in unique_
 #
 #   output: Alice
 #           None
-
+data = {"user": {"profile": {"name": "Alice"}}}
+print(data.get("user").get("profile").get("name"))
 
 # 49. Update a nested dict value without mutating the original.
 #     Take users[0], create a deep-ish copy: {**users[0], "stats": {"logins": 0}}
