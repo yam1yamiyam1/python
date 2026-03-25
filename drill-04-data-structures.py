@@ -970,9 +970,9 @@ print(result)
 #            'armor': ['Elven Cloak', 'Steel Shield', 'Leather Armor'],
 #            'potion': ['Mana Potion', 'Health Potion']}
 result = {}
-for p in products:
+for p in sorted(products, key=lambda x: -x["price"]):
     result.setdefault(p["category"], []).append(p["name"])
-print(result)
+print({category: items[:3] for category, items in result.items()})
 
 # 98. Use a stack to validate this list of bracket pairs:
 #     tests = ["()[]{}", "([)]", "{[]}"]
