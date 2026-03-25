@@ -3,6 +3,9 @@ import sys
 import time
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "data"))
+from collections import deque
+from functools import reduce
+
 from training_data import numbers, orders, products, students, users
 
 # =============================================================================
@@ -694,13 +697,20 @@ print(stack)
 #     new syn: len(stack) == 0  or  not stack
 #
 #   output: False
-
+print(not stack)
 
 # 80. Use a stack to reverse a list of numbers WITHOUT using [::-1] or .reverse().
 #     Push all numbers on, then pop them all off into a new list.
 #
 #   output: [11, 19, 3, 7, 42, 23, 16, 15, 8, 4]
-
+new_stack = []
+for n in numbers:
+    new_stack.append(n)
+print(new_stack)
+reverse_stack = []
+for i in range(len(new_stack)):
+    reverse_stack.append(new_stack.pop(-1))
+print(reverse_stack)
 
 # 81. Use a stack to check if a string has balanced parentheses.
 #     "((()))"  → True
@@ -711,22 +721,66 @@ print(stack)
 #   output: True
 #           False
 #           False
+a = "((()))"
+b = "(()"
+c = "(()()))"
 
 
+def balance_checker(string):
+    stack = []
+    for c in string:
+        if c == "(":
+            stack.append(c)
+        elif c == ")":
+            if not stack:
+                return False
+            stack.pop()
+    return len(stack) == 0
+
+
+print(balance_checker(a))
+print(balance_checker(b))
+print(balance_checker(c))
 # 82. Simulate an undo stack.
 #     actions = ["type A", "type B", "delete", "type C"]
 #     Push each action. Then undo (pop) the last 2. Print remaining.
 #
 #   output: ['type A', 'type B']
-
-
+actions = ["type A", "type B", "delete", "type C"]
+actions.pop()
+actions.pop()
+print(actions)
 # 83. Use a stack to evaluate this postfix expression: "3 4 + 2 *"
 #     Postfix means operator comes after operands.
 #     "3 4 +" means 3+4=7, then "7 2 *" means 7*2=14.
 #     Push numbers, pop two when you hit an operator, push the result.
 #
 #   output: 14
+a = "3 4 + 2 *"
 
+
+def postfix(string):
+    stack = []
+    for c in string.split():
+        if c not in ["+", "-", "*", "/"]:
+            stack.append(int(c))
+        else:
+            right = stack.pop()
+            left = stack.pop()
+            match c:
+                case "+":
+                    result = left + right
+                case "-":
+                    result = left - right
+                case "*":
+                    result = left * right
+                case "/":
+                    result = left / right
+            stack.append(result)
+    return stack[0]
+
+
+print(postfix(a))
 
 # 84. Build a browser history stack. Visit 5 pages (push). Go back 2 (pop).
 #     Print current page.
@@ -734,6 +788,13 @@ print(stack)
 #   pages = ["home", "about", "products", "contact", "cart"]
 #
 #   output: products
+stack = []
+pages = ["home", "about", "products", "contact", "cart"]
+for i in pages:
+    stack.append(i)
+stack.pop()
+stack.pop()
+print(stack[-1])
 
 
 # 85. Use a stack to convert a decimal number to binary.
@@ -748,7 +809,18 @@ print(stack)
 #
 #   call:   decimal_to_binary(13)
 #   output: 1101
+def dec_to_binary(n):
+    stack = []
+    while n > 0:
+        stack.append(n % 2)
+        n = n // 2
+    binary_str = ""
+    while stack:
+        binary_str += str(stack.pop())
+    return binary_str
 
+
+print(dec_to_binary(13))
 
 # =============================================================================
 # SECTION G — QUEUES (86–95)
@@ -762,13 +834,15 @@ print(stack)
 #              q.append(x)   ← enqueue (add to right)
 #
 #   output: deque(['Alice', 'Bob', 'Carol', ...])
-
-
+q = deque()
+for u in users:
+    q.append(u["name"])
+print(q)
 # 87. Peek at the front of the queue without removing.
 #     new syn: q[0]
 #
 #   output: Alice
-
+print(q[0])
 
 # 88. Dequeue 3 items. Print each one as it comes out.
 #     new syn: q.popleft()  ← removes and returns leftmost item
@@ -776,13 +850,15 @@ print(stack)
 #   output: Alice
 #           Bob
 #           Carol
-
+print(q.popleft())
+print(q.popleft())
+print(q.popleft())
 
 # 89. Check if the queue is empty.
 #     new syn: len(q) == 0  or  not q
 #
 #   output: False
-
+print(not q)
 
 # 90. Simulate a print queue. Add 5 jobs. Process (dequeue) them one by one.
 #     Print "Processing: {job}" for each.
@@ -792,8 +868,10 @@ print(stack)
 #   output: Processing: doc1.pdf
 #           Processing: photo.jpg
 #           ...
-
-
+jobs = ["doc1.pdf", "photo.jpg", "report.xlsx", "slide.pptx", "note.txt"]
+print_queue = deque(jobs)
+while print_queue:
+    print(f"Processing: {print_queue.popleft()}")
 # 91. Use a queue to simulate order processing.
 #     Enqueue all pending orders. Process (dequeue) them one by one.
 #     Print "Processing order #{id}" for each.
@@ -801,8 +879,12 @@ print(stack)
 #   output: Processing order #2
 #           Processing order #6
 #           Processing order #8
-
-
+pending_orders = list(
+    map(lambda x: x["id"], filter(lambda x: x["status"] == "pending", orders))
+)
+process_order = deque(pending_orders)
+while process_order:
+    print(f"Processing order #{process_order.popleft()}")
 # 92. Use deque as a bounded queue (max size 3).
 #     new syn: deque(maxlen=3)  ← automatically drops oldest when full
 #     Add 5 items. Print after each addition.
@@ -812,14 +894,19 @@ print(stack)
 #           deque([1, 2, 3], maxlen=3)
 #           deque([2, 3, 4], maxlen=3)
 #           deque([3, 4, 5], maxlen=3)
-
-
+my_queue = deque(maxlen=3)
+to_add = [1, 2, 3, 4, 5]
+for i in to_add:
+    my_queue.append(i)
+    print(my_queue)
 # 93. Use deque to rotate items. Rotate right by 2.
 #     new syn: q.rotate(n)  ← positive = rotate right, negative = rotate left
 #
 #   q = deque([1, 2, 3, 4, 5])
 #   output: deque([4, 5, 1, 2, 3])
-
+q = deque([1, 2, 3, 4, 5])
+q.rotate(2)
+print(q)
 
 # 94. Use a queue to do a breadth-first level-order print of this tree:
 #     tree = {"val": 1, "children": [
@@ -829,8 +916,24 @@ print(stack)
 #     Enqueue root, then dequeue and enqueue children, until queue is empty.
 #
 #   output: 1 2 3 4 5 6
-
-
+tree = {
+    "val": 1,
+    "children": [
+        {
+            "val": 2,
+            "children": [{"val": 4, "children": []}, {"val": 5, "children": []}],
+        },
+        {"val": 3, "children": [{"val": 6, "children": []}]},
+    ],
+}
+queue = deque([tree])
+while queue:
+    print(queue)
+    current_node = queue.popleft()
+    print(current_node["val"])
+    for child in current_node["children"]:
+        queue.append(child)
+print(queue)
 # 95. Use deque to implement a "sliding window" of size 3 over numbers.
 #     Print each window as you slide.
 #
@@ -838,6 +941,11 @@ print(stack)
 #           deque([8, 15, 16], maxlen=3)
 #           deque([15, 16, 23], maxlen=3)
 #           ...
+queue = deque(maxlen=3)
+for n in numbers:
+    queue.append(n)
+    if len(queue) == 3:
+        print(queue)
 
 
 # =============================================================================
@@ -850,7 +958,10 @@ print(stack)
 #
 #   output: {1: [240, 60], 2: [125, 190], 3: [255], ...}
 
-
+result = {}
+for o in orders:
+    result.setdefault(o["userId"], []).append(o["total"])
+print(result)
 # 97. Find the top 3 most expensive products per category.
 #     Build a dict: {category: [sorted product names by price desc, top 3]}
 #     Use list comprehensions and sorted().
@@ -858,7 +969,10 @@ print(stack)
 #   output: {'weapon': ['Dragon Bow', 'War Axe', 'Iron Sword'],
 #            'armor': ['Elven Cloak', 'Steel Shield', 'Leather Armor'],
 #            'potion': ['Mana Potion', 'Health Potion']}
-
+result = {}
+for p in products:
+    result.setdefault(p["category"], []).append(p["name"])
+print(result)
 
 # 98. Use a stack to validate this list of bracket pairs:
 #     tests = ["()[]{}", "([)]", "{[]}"]
@@ -868,15 +982,47 @@ print(stack)
 #   output: True
 #           False
 #           True
+tests = ["()[]{}", "([)]", "{[]}"]
 
+for item in tests:
+    stack = []
+    is_valid = True
+    for c in item:
+        if c in ["(", "[", "{"]:
+            stack.append(c)
+        else:
+            if not stack:
+                is_valid = False
+                break
+            top = stack.pop()
+            match c:
+                case ")":
+                    if top != "(":
+                        is_valid = False
+                        break
+                case "]":
+                    if top != "[":
+                        is_valid = False
+                        break
+                case "}":
+                    if top != "{":
+                        is_valid = False
+                        break
+    print(item, is_valid)
 
-# 99. Use a set to find users who have ordered EVERY product category
-#     (weapon, armor, AND potion).
+# 99. Use a set to find users who have ordered from at least 2 different categories.
 #     Hint: for each user, collect the set of categories they've ordered.
-#           Check if it's a superset of {"weapon", "armor", "potion"}.
+#           Keep users where len(their category set) >= 2.
 #
-#   output: list of user names who ordered all 3 categories
-
+#   output: ['Alice', 'Bob', 'David']
+orders_uid_pids = {}
+user_lookup = {u["id"]: u["name"] for u in users}
+product_lookup = {p["id"]: p["category"] for p in products}
+for o in orders:
+    orders_uid_pids.setdefault(user_lookup.get(o["userId"]), []).append(
+        product_lookup.get(o["productId"])
+    )
+print([u_name for u_name, cats in orders_uid_pids.items() if len(set(cats)) >= 2])
 
 # =============================================================================
 # BOSS DRILL (100)
@@ -906,3 +1052,29 @@ print(stack)
 #              Completed: Order #8 for Frank — $120
 #              ...
 #              Total revenue: $...
+pending_queue = deque([o for o in orders if o["status"] == "pending"])
+processing = deque()
+completed = []
+get_order_id = lambda x: x["id"]
+complete_format = lambda x: (
+    f"Completed: Order #{x['id']} for {user_lookup.get(x['userId'])} - ${x['total']}"
+)
+revenue = lambda arr: reduce(lambda acc, x: acc + x["total"], arr, 0)
+while pending_queue:
+    if len(processing) < 3:
+        current_queue = pending_queue.popleft()
+        print(f"Submitted to Process Order #{get_order_id(current_queue)}")
+        processing.append(current_queue)
+        print(f"Order to Process {len(processing)}/3")
+    if len(processing) == 3:
+        print("Completed 3/3 Orders to Process")
+        print(f"Orders #: {list(get_order_id(o) for o in processing)}\nProcessing...")
+        while processing:
+            done_order = processing.pop()
+            print(complete_format(done_order))
+            completed.append(done_order)
+while processing:
+    done_order = processing.pop()
+    print(complete_format(done_order))
+    completed.append(done_order)
+print(f"Total revenue: ${revenue(completed)}")
