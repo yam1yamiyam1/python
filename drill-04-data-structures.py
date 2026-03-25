@@ -136,14 +136,14 @@ print(list(orders[-3:]))
 #
 #   output: ['Iron Sword', 'Health Potion', 'Leather Armor', 'War Axe']
 
-print(list(products[::2]))
+print([p["name"] for p in products[::2]])
 # 5. Print all product names in reverse order using slicing.
 #
 #   lst[::-1]
 #
 #   output: ['Elven Cloak', 'War Axe', 'Mana Potion', ...]
 
-print(list(map(lambda x: x["name"], products[::-1])))
+print([p["name"] for p in products[::-1]])
 # 6. Create a list of all salaries. Print the min and max WITHOUT using min()/max().
 #
 #   salaries = [get each salary]
