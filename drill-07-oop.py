@@ -1,1617 +1,500 @@
 # ============================================================================
-# DRILL 07: OBJECT-ORIENTED PROGRAMMING (OOP)
+# DRILL 07: OBJECT-ORIENTED PROGRAMMING (OOP) - RESTRUCTURED
 # ============================================================================
 # Python transitioning from JavaScript
 # ============================================================================
 
 # NEW SYNTAX REFERENCE: JS → Python OOP
 # ============================================================================
-# JavaScript                          Python
-# ──────────────────────────────────  ──────────────────────────────────────
-# class MyClass {                     class MyClass:
-#   constructor(x) {                      def __init__(self, x):
-#     this.x = x;                             self.x = x
-#   }
-#   method() { ... }                    def method(self): ...
-# }
-#
-# new MyClass(5)                      MyClass(5)
-#
-# this.x                              self.x
-#
-# static method() { ... }             @staticmethod
-#                                     def method(): ...
-#
-# get x() { ... }                     @property
-#                                     def x(self): ...
-#
-# class Child extends Parent { }      class Child(Parent):
-#                                         pass
-#
-# super()                             super()
-#
-# instanceof                          isinstance()
-#
+# [same reference table as before]
 # ============================================================================
+import os
 
-from data.training_data import numbers, users, products, orders, students
+os.system("cls")
+
 
 # ============================================================================
-# DRILLS 1-100
+# PHASE 1: BASIC CLASSES & INSTANCE METHODS (Drills 1-5)
 # ============================================================================
+# Using class: Car
+class Car:
+    def __init__(self, brand, model):
+        self.brand = brand
+        self.model = model
+
+    def get_brand(self):
+        return self.brand
+    def set_brand
 
 # 1. Basic class definition with __init__
-#
-#   class Car:
-#       def __init__(self, brand, model):
-#           ...store brand and model as instance attributes...
-#
+#   Create Car with brand and model attributes
 #   call:   car = Car("Toyota", "Camry")
-#   output: Car object created
-
-
-
-
+car = Car("Toyota", "Camry")
 # 2. Instance method (simple getter)
-#
-#   class Car:
-#       def __init__(self, brand):
-#           self.brand = brand
-#       def get_brand(self):
-#           ...return self.brand...
-#
-#   call:   car = Car("Honda"); car.get_brand()
-#   output: "Honda"
-
-
-
-
+#   Add get_brand() method
+#   call:   car.get_brand()
+#   output: "Toyota"
+print(car.get_brand())
 # 3. Instance method (simple setter)
-#
-#   class Car:
-#       def __init__(self, brand):
-#           self.brand = brand
-#       def set_brand(self, new_brand):
-#           ...update self.brand...
-#
-#   call:   car = Car("Ford"); car.set_brand("BMW"); print(car.brand)
+#   Add set_brand() method
+#   call:   car.set_brand("BMW"); print(car.brand)
 #   output: "BMW"
 
-
-
-
 # 4. Instance method (behavior)
-#
-#   class Calculator:
-#       def add(self, a, b):
-#           ...return sum of a and b...
-#
-#   call:   calc = Calculator(); calc.add(5, 3)
-#   output: 8
-
-
-
+#   Add describe() method returning formatted string
+#   call:   car.describe()
+#   output: "Toyota Camry"
 
 # 5. Multiple instance attributes
-#
-#   class Person:
-#       def __init__(self, name, age, email):
-#           ...store all three attributes...
-#
-#   call:   person = Person("Alice", 30, "alice@example.com")
-#   output: Person object with three attributes
+#   Extend Car with year, color attributes
+#   Add get_specs() method
+#   call:   car.get_specs()
+#   output: formatted specs string
 
 
-
+# ============================================================================
+# PHASE 2: STRING REPRESENTATION & CLASS VARIABLES (Drills 6-9)
+# ============================================================================
+# Using class: Car (extended)
 
 # 6. String representation with __str__
-#
-#   class Person:
-#       def __init__(self, name, age):
-#           ...store name and age...
-#       def __str__(self):
-#           ...return formatted string representation...
-#
-#   call:   person = Person("Bob", 25); print(person)
-#   output: "Person: Bob, 25" (or similar format)
-
-
-
+#   Add __str__() returning user-friendly format
+#   call:   print(car)
+#   output: "2020 Toyota Camry"
 
 # 7. Class variable (shared across instances)
-#
-#   class Dog:
-#       species = "Canis familiaris"
-#       def __init__(self, name):
-#           self.name = name
-#
-#   call:   dog1 = Dog("Rex"); dog2 = Dog("Buddy"); print(Dog.species)
-#   output: "Canis familiaris"
-
-
-
-
-# 8. Accessing instance vs class variables
-#
-#   class Dog:
-#       species = "Canis familiaris"
-#       def __init__(self, name):
-#           self.name = name
-#       def info(self):
-#           ...return formatted string with name and species...
-#
-#   call:   dog = Dog("Max"); dog.info()
-#   output: "Max is a Canis familiaris"
-
-
-
-
-# 9. Instance method modifying class variable (pitfall)
-#
-#   class Counter:
-#       count = 0
-#       def __init__(self):
-#           Counter.count += 1
-#
-#   call:   c1 = Counter(); c2 = Counter(); print(Counter.count)
+#   Add class variable: car_count = 0
+#   Initialize count in __init__
+#   call:   car1 = Car(...); car2 = Car(...); print(Car.car_count)
 #   output: 2
 
+# 8. Accessing instance vs class variables
+#   Add method info() using both self.brand and Car.car_count
+#   call:   car.info()
+#   output: "Car #2: Toyota Camry"
 
-
-
-# 10. Static method with @staticmethod
-#
-#   class MathUtils:
-#       @staticmethod
-#       def add(a, b):
-#           ...return a + b...
-#
-#   call:   MathUtils.add(5, 3)
-#   output: 8
-
-
-
-
-# 11. Static method doesn't take self
-#
-#   class StringUtils:
-#       @staticmethod
-#       def reverse_string(s):
-#           ...return reversed string...
-#
-#   call:   StringUtils.reverse_string("hello")
-#   output: "olleh"
-
-
-
-
-# 12. Class method with @classmethod and cls parameter
-#
-#   class Animal:
-#       species = "Unknown"
-#       @classmethod
-#       def set_species(cls, name):
-#           ...update cls.species...
-#
-#   call:   Animal.set_species("Mammal"); print(Animal.species)
-#   output: "Mammal"
-
-
-
-
-# 13. Class method as alternative constructor
-#
-#   class Date:
-#       def __init__(self, day, month, year):
-#           ...store day, month, year...
-#       @classmethod
-#       def from_string(cls, date_str):
-#           ...parse "DD/MM/YYYY" and create instance...
-#
-#   call:   date = Date.from_string("25/12/2023")
-#   output: Date object created
-
-
-
-
-# 14. Property decorator @property
-#
-#   class Circle:
-#       def __init__(self, radius):
-#           self._radius = radius
-#       @property
-#       def radius(self):
-#           ...return self._radius...
-#
-#   call:   circle = Circle(5); print(circle.radius)
-#   output: 5
-
-
-
-
-# 15. Property with getter and setter
-#
-#   class Circle:
-#       def __init__(self, radius):
-#           self._radius = radius
-#       @property
-#       def radius(self):
-#           ...return self._radius...
-#       @radius.setter
-#       def radius(self, value):
-#           ...validate value > 0 and set self._radius...
-#
-#   call:   circle = Circle(5); circle.radius = 10; print(circle.radius)
-#   output: 10
-
-
-
-
-# 16. Computed property
-#
-#   class Circle:
-#       def __init__(self, radius):
-#           self._radius = radius
-#       @property
-#       def area(self):
-#           ...return pi * radius^2...
-#
-#   call:   circle = Circle(5); print(circle.area)
-#   output: ~78.54
-
-
-
-
-# 17. Private attribute convention (_attribute)
-#
-#   class BankAccount:
-#       def __init__(self, balance):
-#           self._balance = balance
-#       def get_balance(self):
-#           ...return self._balance...
-#
-#   call:   account = BankAccount(1000); account.get_balance()
-#   output: 1000
-
-
-
-
-# 18. Name mangling with double underscore (__attribute)
-#
-#   class BankAccount:
-#       def __init__(self, balance):
-#           self.__balance = balance
-#       def get_balance(self):
-#           ...return self.__balance...
-#
-#   call:   account = BankAccount(1000); account.get_balance()
-#   output: 1000
-
-
-
-
-# 19. __repr__ for developer-friendly representation
-#
-#   class Person:
-#       def __init__(self, name, age):
-#           self.name = name
-#           self.age = age
-#       def __repr__(self):
-#           ...return repr string like Person('Bob', 25)...
-#
-#   call:   person = Person("Bob", 25); repr(person)
-#   output: "Person('Bob', 25)" or similar
-
-
-
-
-# 20. __len__ for len() support
-#
-#   class CustomList:
-#       def __init__(self, items):
-#           self.items = items
-#       def __len__(self):
-#           ...return length of self.items...
-#
-#   call:   cl = CustomList([1, 2, 3]); len(cl)
+# 9. Instance method modifying class variable (pitfall)
+#   Create multiple instances, show car_count increments
+#   call:   c1 = Car(...); c2 = Car(...); c3 = Car(...)
+#           print(Car.car_count)
 #   output: 3
 
 
+# ============================================================================
+# PHASE 3: MAGIC METHODS - REPRESENTATION (Drills 10-12)
+# ============================================================================
+# Using class: Person (new)
+
+# 10. __str__ vs __repr__ (side-by-side comparison)
+#   Add both methods to Person
+#   __str__() returns "Alice (30)"
+#   __repr__() returns "Person('Alice', 30)"
+#   call:   p = Person("Alice", 30); print(str(p)); print(repr(p))
+#   output: Alice (30)
+#            Person('Alice', 30)
+
+# 11. __len__ for len() support
+#   Create NameList class holding list of names
+#   Add __len__() returning count
+#   call:   nl = NameList(["Alice", "Bob", "Charlie"]); len(nl)
+#   output: 3
+
+# 12. __repr__ for debugging
+#   Add meaningful __repr__() to NameList
+#   call:   nl = NameList([...]); repr(nl)
+#   output: NameList(['Alice', 'Bob', 'Charlie'])
 
 
-# 21. __getitem__ for indexing
-#
-#   class CustomList:
-#       def __init__(self, items):
-#           self.items = items
-#       def __getitem__(self, index):
-#           ...return self.items[index]...
-#
+# ============================================================================
+# PHASE 4: INDEXING & CONTAINER OPERATIONS (Drills 13-16)
+# ============================================================================
+# Using class: CustomList (new)
+
+# 13. __getitem__ for indexing
+#   Add __getitem__() to CustomList
 #   call:   cl = CustomList([10, 20, 30]); cl[1]
 #   output: 20
 
+# 14. __setitem__ for assignment by index
+#   Add __setitem__() to CustomList
+#   call:   cl = CustomList([1, 2, 3]); cl[1] = 99; print(cl[1])
+#   output: 99
 
-
-
-# 22. __setitem__ for assignment by index
-#
-#   class CustomList:
-#       def __init__(self, items):
-#           self.items = items
-#       def __setitem__(self, index, value):
-#           ...set self.items[index] = value...
-#
-#   call:   cl = CustomList([1, 2, 3]); cl[1] = 99; print(cl.items)
-#   output: [1, 99, 3]
-
-
-
-
-# 23. __contains__ for "in" operator
-#
-#   class CustomList:
-#       def __init__(self, items):
-#           self.items = items
-#       def __contains__(self, item):
-#           ...return whether item is in self.items...
-#
+# 15. __contains__ for "in" operator
+#   Add __contains__() to CustomList
 #   call:   cl = CustomList([1, 2, 3]); 2 in cl
 #   output: True
 
+# 16. Combining container methods
+#   Test all three together on same CustomList instance
+#   call:   cl = CustomList([1, 2, 3])
+#           cl[0] = 100
+#           print(100 in cl and len(cl) == 3)
+#   output: True
 
 
+# ============================================================================
+# PHASE 5: OPERATOR OVERLOADING (Drills 17-22)
+# ============================================================================
+# Using class: Vector (new)
 
-# 24. __add__ for + operator
-#
-#   class Vector:
-#       def __init__(self, x, y):
-#           self.x = x
-#           self.y = y
-#       def __add__(self, other):
-#           ...return new Vector with summed coordinates...
-#
+# 17. __add__ for + operator
+#   Add __add__() returning new Vector
 #   call:   v1 = Vector(1, 2); v2 = Vector(3, 4); v3 = v1 + v2
-#   output: v3.x = 4, v3.y = 6
+#   output: v3 = Vector(4, 6)
 
-
-
-
-# 25. __sub__ for - operator
-#
-#   class Vector:
-#       def __init__(self, x, y):
-#           self.x = x
-#           self.y = y
-#       def __sub__(self, other):
-#           ...return new Vector with subtracted coordinates...
-#
+# 18. __sub__ for - operator
+#   Add __sub__() to Vector
 #   call:   v1 = Vector(5, 7); v2 = Vector(2, 3); v3 = v1 - v2
-#   output: v3.x = 3, v3.y = 4
+#   output: v3 = Vector(3, 4)
 
-
-
-
-# 26. __mul__ for * operator
-#
-#   class Vector:
-#       def __init__(self, x, y):
-#           self.x = x
-#           self.y = y
-#       def __mul__(self, scalar):
-#           ...return new Vector with scaled coordinates...
-#
+# 19. __mul__ for * operator
+#   Add __mul__() to Vector (scalar multiplication)
 #   call:   v = Vector(2, 3); v2 = v * 2
-#   output: v2.x = 4, v2.y = 6
+#   output: v2 = Vector(4, 6)
 
+# 20. __str__ for Vector
+#   Add __str__() returning "Vector(x, y)"
+#   call:   v = Vector(2, 3); print(v)
+#   output: Vector(2, 3)
 
+# 21. __eq__ for == operator
+#   Add __eq__() comparing x and y
+#   call:   v1 = Vector(1, 2); v2 = Vector(1, 2); v1 == v2
+#   output: True
 
-
-# 27. __eq__ for == operator
-#
-#   class Point:
-#       def __init__(self, x, y):
-#           self.x = x
-#           self.y = y
-#       def __eq__(self, other):
-#           ...return whether x and y match...
-#
-#   call:   p1 = Point(1, 2); p2 = Point(1, 2); p1 == p2
+# 22. Combining operations
+#   v1 + v2 * 2 == v3, then check if in list
+#   call:   v1 = Vector(1, 1); v2 = Vector(1, 1)
+#           v3 = v1 + v2 * 2  # Vector(3, 3)
+#           print(v3 == Vector(3, 3))
 #   output: True
 
 
+# ============================================================================
+# PHASE 6: COMPARISON OPERATORS (Drills 23-26)
+# ============================================================================
+# Using class: Student (new)
 
-
-# 28. __lt__ for < operator
-#
-#   class Person:
-#       def __init__(self, age):
-#           self.age = age
-#       def __lt__(self, other):
-#           ...return whether self.age < other.age...
-#
-#   call:   p1 = Person(25); p2 = Person(30); p1 < p2
+# 23. __eq__ for == operator
+#   Add __eq__() comparing by student_id
+#   call:   s1 = Student("Alice", 101); s2 = Student("Alice", 101)
+#           s1 == s2
 #   output: True
 
+# 24. __lt__ for < operator (for sorting)
+#   Add __lt__() comparing by gpa
+#   call:   students = [Student("Bob", 2.5), Student("Alice", 3.5)]
+#           sorted(students)[0].name
+#   output: "Bob"
 
-
-
-# 29. __gt__ for > operator
-#
-#   class Person:
-#       def __init__(self, age):
-#           self.age = age
-#       def __gt__(self, other):
-#           ...return whether self.age > other.age...
-#
-#   call:   p1 = Person(30); p2 = Person(25); p1 > p2
+# 25. __le__, __gt__, __ge__ (complete comparison set)
+#   Add all comparison methods
+#   call:   s1 = Student("Alice", 3.0); s2 = Student("Bob", 3.0)
+#           print(s1 <= s2); print(s1 >= s2)
 #   output: True
+#            True
+
+# 26. Sorting students by multiple attributes
+#   Use __lt__() in real sorting scenario
+#   call:   students = [...]
+#           sorted(students) -> sorted by gpa
+#   output: [students sorted by gpa]
 
 
+# ============================================================================
+# PHASE 7: PROPERTIES (Drills 27-32)
+# ============================================================================
+# Using class: Rectangle (new)
 
+# 27. @property basic (read-only)
+#   Add @property width, height
+#   call:   r = Rectangle(4, 5); print(r.width)
+#   output: 4
 
-# 30. __le__ for <= operator
-#
-#   class Score:
-#       def __init__(self, value):
-#           self.value = value
-#       def __le__(self, other):
-#           ...return whether self.value <= other.value...
-#
-#   call:   s1 = Score(80); s2 = Score(90); s1 <= s2
-#   output: True
+# 28. @property computed (area)
+#   Add @property area (computed, not stored)
+#   call:   r = Rectangle(4, 5); print(r.area)
+#   output: 20
 
-
-
-
-# 31. __call__ to make object callable
-#
-#   class Multiplier:
-#       def __init__(self, factor):
-#           self.factor = factor
-#       def __call__(self, x):
-#           ...return x * self.factor...
-#
-#   call:   mult = Multiplier(3); mult(5)
-#   output: 15
-
-
-
-
-# 32. __bool__ for bool conversion
-#
-#   class Container:
-#       def __init__(self, items):
-#           self.items = items
-#       def __bool__(self):
-#           ...return whether items is non-empty...
-#
-#   call:   c1 = Container([1, 2]); bool(c1)
-#   output: True
-
-
-
-
-# 33. __iter__ for iteration support
-#
-#   class CustomRange:
-#       def __init__(self, max_val):
-#           self.max_val = max_val
-#           self.current = 0
-#       def __iter__(self):
-#           ...return self...
-#       def __next__(self):
-#           ...increment current and yield up to max_val...
-#
-#   call:   for i in CustomRange(3): print(i)
-#   output: 0, 1, 2
-
-
-
-
-# 34. __enter__ and __exit__ for context manager
-#
-#   class FileManager:
-#       def __init__(self, filename):
-#           self.filename = filename
-#       def __enter__(self):
-#           ...open file and return...
-#       def __exit__(self, exc_type, exc_val, exc_tb):
-#           ...close file...
-#
-#   call:   with FileManager("test.txt") as f: ...use f...
-#   output: File opened and closed automatically
-
-
-
-
-# 35. Basic single inheritance
-#
-#   class Animal:
-#       def __init__(self, name):
-#           self.name = name
-#       def speak(self):
-#           ...return "Some sound"...
-#
-#   class Dog(Animal):
-#       def speak(self):
-#           ...return "Woof!"...
-#
-#   call:   dog = Dog("Rex"); print(dog.speak())
-#   output: "Woof!"
-
-
-
-
-# 36. Parent class initialization with super().__init__()
-#
-#   class Animal:
-#       def __init__(self, name):
-#           self.name = name
-#
-#   class Dog(Animal):
-#       def __init__(self, name, breed):
-#           ...call super().__init__(name)...
-#           self.breed = breed
-#
-#   call:   dog = Dog("Rex", "Labrador")
-#   output: Dog object with name and breed
-
-
-
-
-# 37. Accessing parent method
-#
-#   class Animal:
-#       def describe(self):
-#           ...return "This is an animal"...
-#
-#   class Dog(Animal):
-#       def describe(self):
-#           ...call super().describe() and append dog info...
-#
-#   call:   dog = Dog(); dog.describe()
-#   output: "This is an animal. It's a dog."
-
-
-
-
-# 38. Method overriding
-#
-#   class Shape:
-#       def area(self):
-#           ...raise NotImplementedError...
-#
-#   class Circle(Shape):
-#       def __init__(self, radius):
-#           self.radius = radius
-#       def area(self):
-#           ...return pi * radius^2...
-#
-#   call:   circle = Circle(5); circle.area()
-#   output: ~78.54
-
-
-
-
-# 39. isinstance() check
-#
-#   class Animal:
-#       pass
-#
-#   class Dog(Animal):
-#       pass
-#
-#   call:   dog = Dog(); isinstance(dog, Dog)
-#   output: True
-
-
-
-
-# 40. isinstance() with inheritance
-#
-#   class Animal:
-#       pass
-#
-#   class Dog(Animal):
-#       pass
-#
-#   call:   dog = Dog(); isinstance(dog, Animal)
-#   output: True (Dog is subclass of Animal)
-
-
-
-
-# 41. Multiple inheritance
-#
-#   class Walker:
-#       def walk(self):
-#           ...return "Walking"...
-#
-#   class Swimmer:
-#       def swim(self):
-#           ...return "Swimming"...
-#
-#   class Duck(Walker, Swimmer):
-#       pass
-#
-#   call:   duck = Duck(); duck.walk(); duck.swim()
-#   output: "Walking", "Swimming"
-
-
-
-
-# 42. Method Resolution Order (MRO) with __mro__
-#
-#   class A: pass
-#   class B(A): pass
-#   class C(A): pass
-#   class D(B, C): pass
-#
-#   call:   print(D.__mro__)
-#   output: (D, B, C, A, object)
-
-
-
-
-# 43. Using super() with multiple inheritance
-#
-#   class A:
-#       def method(self):
-#           ...return "A"...
-#
-#   class B(A):
-#       def method(self):
-#           ...call super().method() and append "B"...
-#
-#   call:   b = B(); b.method()
-#   output: "AB"
-
-
-
-
-# 44. Abstract base class concept (without ABC module)
-#
-#   class Shape:
-#       def area(self):
-#           ...raise NotImplementedError("Subclasses must implement area()")...
-#
-#   class Rectangle(Shape):
-#       def __init__(self, w, h):
-#           self.w = w
-#           self.h = h
-#       def area(self):
-#           ...return w * h...
-#
-#   call:   rect = Rectangle(5, 10); rect.area()
+# 29. @property.setter with validation
+#   Add width.setter validating > 0
+#   call:   r = Rectangle(4, 5); r.width = 10; print(r.area)
 #   output: 50
 
+# 30. @property.setter rejecting invalid values
+#   Try r.width = -5, catch error
+#   call:   try: r.width = -5
+#           except ValueError: print("Invalid")
+#   output: Invalid
+
+# 31. Multiple computed properties
+#   Add @property perimeter
+#   call:   r = Rectangle(4, 5); print(r.perimeter)
+#   output: 18
+
+# 32. Properties work like attributes (not methods)
+#   Compare property access vs method call
+#   call:   r.area vs r.get_area()  (if method existed)
+#           Both called as r.area (no parentheses)
 
 
+# ============================================================================
+# PHASE 8: STATIC & CLASS METHODS (Drills 33-36)
+# ============================================================================
+# Using class: Date (new)
 
-# 45. Polymorphism: Different classes, same interface
-#
-#   class Circle:
-#       def __init__(self, r):
-#           self.r = r
-#       def area(self):
-#           ...return pi * r^2...
-#
-#   class Square:
-#       def __init__(self, side):
-#           self.side = side
-#       def area(self):
-#           ...return side^2...
-#
-#   call:   shapes = [Circle(5), Square(4)]; [s.area() for s in shapes]
-#   output: [~78.54, 16]
+# 33. @staticmethod utility function
+#   Add @staticmethod is_leap_year(year)
+#   call:   Date.is_leap_year(2024)
+#   output: True
 
+# 34. @staticmethod doesn't access instance
+#   Add @staticmethod validate_date(day, month, year)
+#   call:   Date.validate_date(29, 2, 2024)
+#   output: True
 
+# 35. @classmethod factory constructor
+#   Add @classmethod from_string(cls, "25/12/2023")
+#   call:   d = Date.from_string("25/12/2023")
+#           print(d.day, d.month, d.year)
+#   output: 25 12 2023
 
-
-# 46. Encapsulation with private methods
-#
-#   class BankAccount:
-#       def __init__(self, balance):
-#           self.__balance = balance
-#       def __validate(self):
-#           ...check balance > 0...
-#       def withdraw(self, amount):
-#           ...validate and update balance...
-#
-#   call:   account = BankAccount(1000); account.withdraw(100)
-#   output: Balance updated (private method called internally)
+# 36. @classmethod vs @staticmethod (comparison)
+#   Show difference: @classmethod can create instances
+#   call:   d = Date.from_string("01/01/2024")  # @classmethod
+#           vs
+#           is_valid = Date.is_leap_year(2024)  # @staticmethod
+#   output: Both work, different purposes
 
 
+# ============================================================================
+# PHASE 9: INHERITANCE - BASICS (Drills 37-41)
+# ============================================================================
+# Using class hierarchy: Animal → Dog, Cat
 
-
-# 47. Getters and setters pattern
-#
-#   class Temperature:
-#       def __init__(self, celsius):
-#           self._celsius = celsius
-#       def get_celsius(self):
-#           ...return self._celsius...
-#       def get_fahrenheit(self):
-#           ...return (celsius * 9/5) + 32...
-#       def set_celsius(self, value):
-#           ...validate value and set...
-#
-#   call:   temp = Temperature(0); temp.get_fahrenheit()
-#   output: 32
-
-
-
-
-# 48. Class with default parameter values
-#
-#   class Car:
-#       def __init__(self, brand, model="Unknown", year=2020):
-#           self.brand = brand
-#           self.model = model
-#           self.year = year
-#
-#   call:   car = Car("Toyota"); print(car.model, car.year)
-#   output: "Unknown", 2020
-
-
-
-
-# 49. Class with *args in __init__
-#
-#   class Container:
-#       def __init__(self, *items):
-#           self.items = items
-#
-#   call:   container = Container(1, 2, 3, 4); print(container.items)
-#   output: (1, 2, 3, 4)
-
-
-
-
-# 50. Class with **kwargs in __init__
-#
-#   class Config:
-#       def __init__(self, **settings):
-#           self.settings = settings
-#
-#   call:   config = Config(debug=True, timeout=30); print(config.settings)
-#   output: {"debug": True, "timeout": 30}
-
-
-
-
-# 51. __init__ with *args and **kwargs
-#
-#   class FlexibleClass:
-#       def __init__(self, *args, **kwargs):
-#           self.args = args
-#           self.kwargs = kwargs
-#
-#   call:   obj = FlexibleClass(1, 2, name="test"); print(obj.args, obj.kwargs)
-#   output: (1, 2), {"name": "test"}
-
-
-
-
-# 52. Instance vs class variable shadowing
-#
-#   class Counter:
-#       count = 0
-#       def __init__(self):
-#           self.count = 1
-#
-#   call:   c1 = Counter(); c2 = Counter(); print(c1.count, c2.count, Counter.count)
-#   output: 1, 1, 0
-
-
-
-
-# 53. Method that modifies and returns self (fluent API)
-#
-#   class StringBuilder:
-#       def __init__(self):
-#           self.content = ""
-#       def add(self, text):
-#           self.content += text
-#           ...return self...
-#
-#   call:   sb = StringBuilder().add("Hello").add(" ").add("World")
-#   output: sb.content = "Hello World"
-
-
-
-
-# 54. __hash__ for hashability
-#
-#   class Point:
-#       def __init__(self, x, y):
-#           self.x = x
-#           self.y = y
-#       def __hash__(self):
-#           ...return hash of (x, y)...
-#
-#   call:   p = Point(1, 2); my_set = {p}
-#   output: Point can be added to set
-
-
-
-
-# 55. __slots__ for memory efficiency
-#
-#   class Point:
-#       __slots__ = ["x", "y"]
-#       def __init__(self, x, y):
-#           self.x = x
-#           self.y = y
-#
-#   call:   p = Point(1, 2); print(p.x, p.y)
-#   output: 1, 2
-
-
-
-
-# 56. Descriptor protocol with __get__ and __set__
-#
-#   class ValidatedInt:
+# 37. Basic single inheritance
+#   class Animal:
 #       def __init__(self, name):
 #           self.name = name
-#       def __get__(self, obj, objtype=None):
-#           ...return obj.__dict__[self.name]...
-#       def __set__(self, obj, value):
-#           ...validate int and set...
+#       def speak(self):
+#           return "Some sound"
 #
-#   call:   (descriptor protocol demo)
-#   output: Descriptor behavior
-
-
-
-
-# 57. Class decorator
-#
-#   def add_method(cls):
-#       def new_method(self):
-#           ...return "Added by decorator"...
-#       cls.new_method = new_method
-#       return cls
-#
-#   @add_method
-#   class MyClass:
+#   class Dog(Animal):
 #       pass
 #
-#   call:   obj = MyClass(); obj.new_method()
-#   output: "Added by decorator"
+#   call:   dog = Dog("Rex")
+#   output: dog.name = "Rex"
+
+# 38. Method overriding
+#   Override speak() in Dog
+#   call:   dog.speak()
+#   output: "Woof"
+
+# 39. super().__init__() in constructor
+#   Dog.__init__ calls super().__init__(name) then adds breed
+#   call:   dog = Dog("Rex", "Labrador")
+#           print(dog.name, dog.breed)
+#   output: Rex Labrador
+
+# 40. super().method() calling parent method
+#   Dog.speak() calls super().speak() then appends info
+#   call:   dog.speak()
+#   output: "Some sound (from dog)"
+
+# 41. Polymorphism - same method, different behavior
+#   Create Dog and Cat, both override speak()
+#   Create list of animals, loop calling speak()
+#   call:   animals = [Dog("Rex"), Cat("Whiskers")]
+#           for animal in animals: print(animal.speak())
+#   output: Woof
+#            Meow
 
 
+# ============================================================================
+# PHASE 10: INHERITANCE - ADVANCED (Drills 42-46)
+# ============================================================================
+# Using class hierarchy: Animal → Dog → ServiceDog
+
+# 42. Multi-level inheritance
+#   ServiceDog(Dog) adds trained=True
+#   call:   sd = ServiceDog("Max", "Labrador")
+#           isinstance(sd, Animal)
+#   output: True
+
+# 43. isinstance() and issubclass()
+#   Test isinstance on Dog and ServiceDog
+#   Test issubclass relationships
+#   call:   isinstance(sd, Dog), isinstance(sd, Animal)
+#           issubclass(ServiceDog, Dog), issubclass(ServiceDog, Animal)
+#   output: True, True, True, True
+
+# 44. Method Resolution Order (MRO)
+#   Show how super() decides which parent method to call
+#   call:   print(ServiceDog.__mro__)
+#   output: (ServiceDog, Dog, Animal, object)
+
+# 45. Multiple inheritance (Diamond problem preview)
+#   class Swimmer: def swim(): ...
+#   class Flyer: def fly(): ...
+#   class Duck(Swimmer, Flyer): pass
+#   call:   duck = Duck(); duck.swim(); duck.fly()
+#   output: Swimming...
+#            Flying...
+
+# 46. Property inheritance
+#   Parent has @property age, child overrides it
+#   call:   dog.age vs cat.age (different calculation)
 
 
-# 58. Composition over inheritance (has-a relationship)
-#
-#   class Engine:
-#       def start(self):
-#           ...return "Engine started"...
-#
-#   class Car:
-#       def __init__(self):
-#           self.engine = Engine()
-#       def start(self):
-#           ...return self.engine.start()...
-#
+# ============================================================================
+# PHASE 11: CONTEXT MANAGERS & MAGIC METHODS (Drills 47-50)
+# ============================================================================
+# Using class: FileManager (new)
+
+# 47. __enter__ and __exit__ for context manager
+#   Add both methods
+#   call:   with FileManager("test.txt") as f:
+#               print("Inside context")
+#   output: Opened test.txt
+#            Inside context
+#            Closed test.txt
+
+# 48. Context manager error handling
+#   __exit__ handles exceptions
+#   call:   with FileManager("test.txt") as f:
+#               raise ValueError("test error")
+#           (error caught and file closed)
+
+# 49. __call__ making object callable
+#   Add __call__() to Multiplier class
+#   call:   mult = Multiplier(3); result = mult(5)
+#   output: 15
+
+# 50. __bool__ for truthy/falsy values
+#   Add __bool__() to Container
+#   call:   c = Container([1, 2])
+#           if c: print("Has items")
+#   output: Has items
+
+
+# ============================================================================
+# PHASE 12: PRIVATE ATTRIBUTES & ENCAPSULATION (Drills 51-54)
+# ============================================================================
+# Using class: BankAccount (new)
+
+# 51. Private attribute convention (_attribute)
+#   Use _balance private variable
+#   Add public method get_balance()
+#   call:   acc = BankAccount(1000)
+#           print(acc.get_balance())  # public method
+#           acc._balance = 0  # technically possible but not recommended
+#   output: 1000
+
+# 52. Name mangling with double underscore (__attribute)
+#   Use __balance (becomes _BankAccount__balance internally)
+#   call:   acc = BankAccount(1000)
+#           acc.get_balance()  # works
+#           acc.__balance  # raises AttributeError
+#   output: 1000
+#            AttributeError
+
+# 53. Property with private attribute
+#   @property balance returns __balance
+#   @property.setter validates before updating
+#   call:   acc = BankAccount(1000)
+#           acc.balance = 500  # uses setter
+#           print(acc.balance)  # uses getter
+#   output: 500
+
+# 54. Encapsulation in action
+#   deposit() and withdraw() modify __balance
+#   Balance can only change through methods
+#   call:   acc.deposit(500); acc.withdraw(200)
+#           print(acc.balance)
+#   output: 1300
+
+
+# ============================================================================
+# PHASE 13: COMPLEX FEATURES (Drills 55-60)
+# ============================================================================
+
+# 55. __hash__ and __eq__ for set membership
+#   Point class with both methods
+#   call:   p1 = Point(1, 2); p2 = Point(1, 2)
+#           points_set = {p1, p2}
+#           len(points_set)
+#   output: 1 (duplicate point recognized)
+
+# 56. __iter__ and __next__ making class iterable
+#   Range class with iteration
+#   call:   for i in Range(1, 4): print(i)
+#   output: 1
+#            2
+#            3
+
+# 57. __slots__ for memory efficiency
+#   Point with __slots__ = ['x', 'y']
+#   call:   p = Point(1, 2); print(p.x)
+#           p.z = 3  # raises AttributeError
+#   output: 1
+#            AttributeError
+
+# 58. Descriptor protocol (__get__, __set__)
+#   ValidatedInt descriptor
+#   call:   (advanced topic - showcase only)
+
+# 59. Class decorator
+#   @add_repr decorator adds __repr__
+#   call:   (showcase usage)
+
+# 60. Composition over inheritance
+#   Car has-a Engine (composition)
+#   Car is-a Vehicle (inheritance)
 #   call:   car = Car(); car.start()
 #   output: "Engine started"
 
 
-
-
-# 59. Inheritance chain (grandparent → parent → child)
-#
-#   class Animal: pass
-#   class Mammal(Animal): pass
-#   class Dog(Mammal): pass
-#
-#   call:   dog = Dog(); isinstance(dog, Animal)
-#   output: True
-
-
-
-
-# 60. Checking subclass with issubclass()
-#
-#   class Animal: pass
-#   class Dog(Animal): pass
-#
-#   call:   issubclass(Dog, Animal)
-#   output: True
-
-
-
-
-# 61. Class method as factory pattern
-#
-#   class Person:
-#       def __init__(self, name, age):
-#           self.name = name
-#           self.age = age
-#       @classmethod
-#       def from_birth_year(cls, name, birth_year):
-#           age = 2024 - birth_year
-#           ...return cls(name, age)...
-#
-#   call:   person = Person.from_birth_year("Alice", 1990)
-#   output: Person with age calculated
-
-
-
-
-# 62. Static method utility function
-#
-#   class Validator:
-#       @staticmethod
-#       def is_email(email):
-#           ...check if "@" in email...
-#
-#   call:   Validator.is_email("test@example.com")
-#   output: True
-
-
-
-
-# 63. Class with all magic methods combined
-#
-#   class DynamicDict:
-#       def __init__(self, **data):
-#           self.data = data
-#       def __getitem__(self, key):
-#           ...return data[key]...
-#       def __setitem__(self, key, value):
-#           ...set data[key]...
-#       def __contains__(self, key):
-#           ...check key in data...
-#       def __len__(self):
-#           ...return len(data)...
-#
-#   call:   dd = DynamicDict(a=1, b=2); dd["a"]
-#   output: 1
-
-
-
-
-# 64. __del__ destructor (when object is garbage collected)
-#
-#   class Resource:
-#       def __init__(self, name):
-#           self.name = name
-#       def __del__(self):
-#           ...print cleanup message...
-#
-#   call:   r = Resource("test"); del r
-#   output: Cleanup message printed
-
-
-
-
-# 65. Metaclass preview (class of a class)
-#
-#   class SingletonMeta(type):
-#       _instances = {}
-#       def __call__(cls, *args, **kwargs):
-#           if cls not in cls._instances:
-#               cls._instances[cls] = ...create instance...
-#           return cls._instances[cls]
-#
-#   call:   (demo singleton pattern)
-#   output: Only one instance created
-
-
-
-
-# 66. Dataclass @dataclass (Python 3.7+)
-#
-#   from dataclasses import dataclass
-#   @dataclass
-#   class Person:
-#       name: str
-#       age: int
-#
-#   call:   person = Person("Alice", 30)
-#   output: Person with auto-generated __init__ and __repr__
-
-
-
-
-# 67. Inheritance with multiple levels and super()
-#
-#   class A:
-#       def method(self): ...return "A"...
-#   class B(A):
-#       def method(self): ...return super().method() + "B"...
-#   class C(B):
-#       def method(self): ...return super().method() + "C"...
-#
-#   call:   c = C(); c.method()
-#   output: "ABC"
-
-
-
-
-# 68. Diamond problem (multiple inheritance)
-#
-#   class A: pass
-#   class B(A): pass
-#   class C(A): pass
-#   class D(B, C): pass
-#
-#   call:   print(D.__mro__)
-#   output: (D, B, C, A, object)
-
-
-
-
-# 69. Class with property and private attributes
-#
-#   class Rectangle:
-#       def __init__(self, width, height):
-#           self._width = width
-#           self._height = height
-#       @property
-#       def area(self):
-#           ...return width * height...
-#       @property
-#       def perimeter(self):
-#           ...return 2 * (width + height)...
-#
-#   call:   rect = Rectangle(4, 5); rect.area
-#   output: 20
-
-
-
-
-# 70. Operator overloading with __str__, __repr__, and __format__
-#
-#   class Money:
-#       def __init__(self, amount, currency):
-#           self.amount = amount
-#           self.currency = currency
-#       def __str__(self):
-#           ...return formatted string...
-#       def __repr__(self):
-#           ...return Money(amount, currency)...
-#       def __format__(self, spec):
-#           ...return formatted based on spec...
-#
-#   call:   m = Money(100, "USD"); print(m)
-#   output: "100 USD"
-
-
-
-
-# 71. Inherhitance with property override
-#
-#   class Animal:
-#       @property
-#       def sound(self):
-#           ...return "Generic sound"...
-#
-#   class Dog(Animal):
-#       @property
-#       def sound(self):
-#           ...return "Woof"...
-#
-#   call:   dog = Dog(); print(dog.sound)
-#   output: "Woof"
-
-
-
-
-# 72. Method as property (no @property decorator, just naming)
-#
-#   class Circle:
-#       def __init__(self, radius):
-#           self.radius = radius
-#       def get_circumference(self):
-#           ...return 2 * pi * radius...
-#
-#   call:   circle = Circle(5); circle.get_circumference()
-#   output: ~31.4
-
-
-
-
-# 73. Class inheritance with different __init__ signatures
-#
-#   class Parent:
-#       def __init__(self, name):
-#           self.name = name
-#
-#   class Child(Parent):
-#       def __init__(self, name, age):
-#           ...call super().__init__(name)...
-#           self.age = age
-#
-#   call:   child = Child("Alice", 10)
-#   output: Child with name and age
-
-
-
-
-# 74. Type checking with type() function
-#
-#   class Dog: pass
-#   class Cat: pass
-#
-#   call:   dog = Dog(); type(dog) == Dog
-#   output: True
-
-
-
-
-# 75. Type checking isinstance() vs type()
-#
-#   class Animal: pass
-#   class Dog(Animal): pass
-#
-#   call:   dog = Dog(); isinstance(dog, Animal) vs type(dog) == Animal
-#   output: isinstance is True, type check is False
-
-
-
-
-# 76. Class with object initialization logic
-#
-#   class Config:
-#       def __init__(self, **settings):
-#           ...validate all settings...
-#           ...store validated settings...
-#
-#   call:   config = Config(timeout=30, debug=True)
-#   output: Config with validated settings
-
-
-
-
-# 77. Inheritance with mixin class pattern
-#
-#   class TimestampMixin:
-#       def timestamp(self):
-#           ...return current timestamp...
-#
-#   class Document(TimestampMixin):
-#       def __init__(self, title):
-#           self.title = title
-#
-#   call:   doc = Document("Test"); doc.timestamp()
-#   output: Current timestamp
-
-
-
-
-# 78. Class variable vs instance variable in memory
-#
-#   class Test:
-#       class_var = []
-#       def __init__(self):
-#           self.instance_var = []
-#
-#   call:   (demonstrate difference)
-#   output: class_var shared, instance_var separate
-
-
-
-
-# 79. Inheritance from built-in types
-#
-#   class MyList(list):
-#       def first(self):
-#           ...return self[0]...
-#
-#   call:   ml = MyList([1, 2, 3]); ml.first()
-#   output: 1
-
-
-
-
-# 80. Inheritance from built-in dict
-#
-#   class MyDict(dict):
-#       def get_or_default(self, key, default=None):
-#           ...return self.get(key, default)...
-#
-#   call:   md = MyDict({"a": 1}); md.get_or_default("b", 0)
-#   output: 0
-
-
-
-
-# 81. Class method modifying class state
-#
-#   class Registry:
-#       items = []
-#       @classmethod
-#       def register(cls, item):
-#           cls.items.append(item)
-#       @classmethod
-#       def get_all(cls):
-#           ...return cls.items...
-#
-#   call:   Registry.register("item1"); Registry.get_all()
-#   output: ["item1"]
-
-
-
-
-# 82. __getattr__ for dynamic attribute access
-#
-#   class DynamicAttrs:
-#       def __getattr__(self, name):
-#           ...return f"Attribute {name} not found"...
-#
-#   call:   da = DynamicAttrs(); da.anything
-#   output: "Attribute anything not found"
-
-
-
-
-# 83. __getattribute__ override (all attribute access)
-#
-#   class Logged:
-#       def __getattribute__(self, name):
-#           print(f"Accessing {name}")
-#           ...return super().__getattribute__(name)...
-#
-#   call:   l = Logged(); l.x
-#   output: "Accessing x" printed
-
-
-
-
-# 84. Abstract methods with NotImplementedError
-#
-#   class Shape:
-#       def area(self):
-#           ...raise NotImplementedError...
-#       def perimeter(self):
-#           ...raise NotImplementedError...
-#
-#   class Circle(Shape):
-#       def area(self):
-#           ...compute area...
-#
-#   call:   circle = Circle(); circle.area()
-#   output: Area computed
-
-
-
-
-# 85. Class with validation in __init__
-#
-#   class User:
-#       def __init__(self, email, age):
-#           ...validate email format...
-#           ...validate age >= 0...
-#           self.email = email
-#           self.age = age
-#
-#   call:   user = User("test@example.com", 25)
-#   output: User object created
-
-
-
-
-# 86. Multiple inheritance with method conflict resolution
-#
-#   class A:
-#       def method(self): ...return "A"...
-#   class B:
-#       def method(self): ...return "B"...
-#   class C(A, B):
-#       pass
-#
-#   call:   c = C(); c.method()
-#   output: "A" (MRO resolves to A first)
-
-
-
-
-# 87. Object comparison with __ne__
-#
-#   class Person:
-#       def __init__(self, name):
-#           self.name = name
-#       def __eq__(self, other):
-#           ...return self.name == other.name...
-#       def __ne__(self, other):
-#           ...return not self.__eq__(other)...
-#
-#   call:   p1 = Person("Alice"); p2 = Person("Bob"); p1 != p2
-#   output: True
-
-
-
-
-# 88. Class with inheritance and property override
-#
-#   class Base:
-#       def __init__(self, value):
-#           self._value = value
-#       @property
-#       def value(self):
-#           ...return self._value...
-#
-#   class Derived(Base):
-#       @property
-#       def value(self):
-#           ...return self._value * 2...
-#
-#   call:   d = Derived(5); d.value
-#   output: 10
-
-
-
-
-# 89. __index__ for integer conversion
-#
-#   class CustomInt:
-#       def __init__(self, value):
-#           self.value = value
-#       def __index__(self):
-#           ...return self.value...
-#
-#   call:   ci = CustomInt(5); lst = [1, 2, 3]; lst[ci]
-#   output: lst[5] raises IndexError or lst[5]
-
-
-
-
-# 90. Class with lazy evaluation
-#
-#   class LazyValue:
-#       def __init__(self, fn):
-#           self._fn = fn
-#           self._value = None
-#       @property
-#       def value(self):
-#           if self._value is None:
-#               ...self._value = self._fn()...
-#           return self._value
-#
-#   call:   lv = LazyValue(lambda: 10 + 20); lv.value
-#   output: 30 (computed on first access)
-
-
-
-
-# 91. Inheritance with __init__ chain
-#
-#   class A:
-#       def __init__(self):
-#           print("A")
-#   class B(A):
-#       def __init__(self):
-#           ...super().__init__()...
-#           print("B")
-#   class C(B):
-#       def __init__(self):
-#           ...super().__init__()...
-#           print("C")
-#
-#   call:   c = C()
-#   output: "A", "B", "C"
-
-
-
-
-# 92. Class adapting from dict to object
-#
-#   class DictToObj:
-#       def __init__(self, data_dict):
-#           ...set all keys as attributes...
-#
-#   call:   obj = DictToObj({"name": "Alice", "age": 30}); obj.name
-#   output: "Alice"
-
-
-
-
-# 93. Class with read-only properties
-#
-#   class Immutable:
-#       def __init__(self, value):
-#           self._value = value
-#       @property
-#       def value(self):
-#           ...return self._value...
-#       @value.setter
-#       def value(self, val):
-#           ...raise AttributeError("read-only")...
-#
-#   call:   im = Immutable(10); im.value = 20
-#   output: AttributeError: read-only
-
-
-
-
-# 94. Operator overloading with __truediv__ for /
-#
-#   class Vector:
-#       def __init__(self, x, y):
-#           self.x = x
-#           self.y = y
-#       def __truediv__(self, scalar):
-#           ...return new Vector with divided coordinates...
-#
-#   call:   v = Vector(10, 20); v2 = v / 2
-#   output: v2.x = 5, v2.y = 10
-
-
-
-
-# 95. Class with dependency injection
-#
-#   class Logger:
-#       def log(self, msg): ...print msg...
-#
-#   class Service:
-#       def __init__(self, logger):
-#           self.logger = logger
-#       def do_work(self):
-#           ...self.logger.log("Working")...
-#
-#   call:   logger = Logger(); service = Service(logger); service.do_work()
-#   output: "Working" printed
-
-
-
-
-# 96. Abstract base class (Python ABC module preview)
-#
-#   from abc import ABC, abstractmethod
-#   class Animal(ABC):
-#       @abstractmethod
-#       def speak(self):
-#           pass
-#
-#   class Dog(Animal):
-#       def speak(self):
-#           ...return "Woof"...
-#
-#   call:   dog = Dog(); dog.speak()
-#   output: "Woof"
-
-
-
-
-# 97. Inheritance with cached property
-#
-#   from functools import cached_property
-#   class Circle:
-#       def __init__(self, radius):
-#           self.radius = radius
-#       @cached_property
-#       def area(self):
-#           ...return pi * radius^2...
-#
-#   call:   circle = Circle(5); circle.area
-#   output: ~78.54 (cached on first access)
-
-
-
-
-# 98. Class composition with multiple objects
-#
-#   class Engine: pass
-#   class Transmission: pass
-#   class Car:
-#       def __init__(self):
-#           self.engine = Engine()
-#           self.transmission = Transmission()
-#
-#   call:   car = Car(); car.engine, car.transmission
-#   output: Engine and Transmission objects
-
-
-
-
-# 99. Complex class hierarchy with shared behavior
-#
-#   class Vehicle:
-#       def __init__(self, brand):
-#           self.brand = brand
-#       def start(self):
-#           ...return "Starting"...
-#   class Car(Vehicle):
-#       def start(self):
-#           ...return super().start() + " car"...
-#   class Motorcycle(Vehicle):
-#       def start(self):
-#           ...return super().start() + " motorcycle"...
-#
-#   call:   car = Car("Toyota"); moto = Motorcycle("Harley"); car.start(); moto.start()
-#   output: "Starting car", "Starting motorcycle"
-
-
-
-
-# 100. BOSS DRILL: Complete User Management System
-#
-#   Create a user management system combining:
-#   - Multiple classes with inheritance
-#   - Magic methods for comparison and representation
-#   - Properties with validation
-#   - Class methods for factory pattern
-#   - Static methods for utilities
-#   - Polymorphism
-#
-#   class User:
-#       """Base user class"""
-#       def __init__(self, username, email):
-#           ...validate username and email...
-#           self.username = username
-#           self.email = email
-#           self.created_at = ...current time...
-#
-#       def __str__(self):
-#           ...return formatted user info...
-#       def __repr__(self):
-#           ...return User('...', '...')...
-#       def __eq__(self, other):
-#           ...compare by username...
-#       def __lt__(self, other):
-#           ...compare by creation time...
-#
-#       @property
-#       def email(self):
-#           ...return self._email...
-#       @email.setter
-#       def email(self, value):
-#           ...validate email format...
-#           self._email = value
-#
-#       @staticmethod
-#       def is_valid_email(email):
-#           ...check "@" and domain...
-#
-#       @classmethod
-#       def from_user_dict(cls, user_data):
-#           ...create User from {"username": ..., "email": ...}...
-#
-#   class Admin(User):
-#       """Admin user with permissions"""
-#       def __init__(self, username, email, permissions=None):
-#           ...super().__init__(username, email)...
-#           self.permissions = permissions or []
-#
-#       def grant_permission(self, permission):
-#           ...add permission...
-#       def has_permission(self, permission):
-#           ...check permission...
-#
-#   class UserRegistry:
-#       """Manage multiple users"""
-#       def __init__(self):
-#           self.users = {}
-#
-#       def add_user(self, user):
-#           ...validate user instance...
-#           ...store by username...
-#       def find_user(self, username):
-#           ...return user or None...
-#       def get_all_users(self):
-#           ...return list of all users...
-#       def get_admins(self):
-#           ...return only Admin instances...
-#       def remove_user(self, username):
-#           ...remove user from registry...
+# ============================================================================
+# PHASE 14: BOSS DRILL (Drill 100)
+# ============================================================================
+# Complete E-Commerce System
+
+# 100. BOSS DRILL: E-Commerce System
+#   Create 3 integrated classes: Product, Order, OrderProcessor
+#
+#   Product:
+#     - __init__(id, name, price, stock)
+#     - @property in_stock
+#     - @classmethod from_dict(cls, dict)
+#     - reduce_stock(qty)
+#     - __str__(), __repr__()
+#
+#   Order:
+#     - __init__(order_id, user_id)
+#     - items list
+#     - add_item(product, qty)
+#     - @property total
+#     - __len__(), __contains__()
+#     - get_summary()
+#
+#   OrderProcessor:
+#     - @staticmethod validate_order(order)
+#     - process(order) - reduces stock
+#     - cancel_order(order) - restores stock
 #
 #   call:
-#       - Create users and admins from user_data list
-#       - Add them to registry
-#       - Find specific users
-#       - List all users sorted
-#       - Filter admins
-#       - Demonstrate polymorphism (both User and Admin have email property)
-#
-#   output: Complete user management with:
-#       - 3+ users of mixed types
-#       - Admin with permissions
-#       - Search results
-#       - Sorted user list
-#       - Polymorphic method calls
+#     p1 = Product(1, "Sword", 150, 10)
+#     p2 = Product(2, "Shield", 100, 5)
+#     order = Order(101, 1)
+#     order.add_item(p1, 2)
+#     order.add_item(p2, 1)
+#     print(f"Total: {order.total}")
+#     print(f"Items: {len(order)}")
+#     processor = OrderProcessor()
+#     processor.process(order)
+#     print(f"P1 stock: {p1.stock}")
+#   output:
+#     Total: 400
+#     Items: 2
+#     P1 stock: 8
