@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Python Exceptions Cheat Sheet</title>
+<style>
+  :root {
+    --bg: #f7f7f5;
+    --surface: #ffffff;
+    --surface2: #f0efed;
+    --border: #d9d6d1;
+    --text: #1c1b19;
+    --text2: #6e6a64;
+    --accent: #d4551f;
+    --accent2: #2563a8;
+    --highlight: #fff3c4;
+    --row-hover: #f5f3ef;
+    --code-bg: #efede8;
+    --shadow: 0 10px 30px rgba(0,0,0,0.06);
+  }
+
+  [data-theme="dark"] {
+    --bg: #141412;
+    --surface: #1d1c1a;
+    --surface2: #25231f;
+    --border: #34312d;
+    --text: #ece9e2;
+    --text2: #9b968f;
+    --accent: #e56c3f;
+    --accent2: #5b9bd5;
+    --highlight: #3a3000;
+    --row-hover: #24211d;
+    --code-bg: #25231f;
+    --shadow: 0 10px 30px rgba(0,0,0,0.24);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100%; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.45;
+    font-size: 14px;
+  }
+
+  .app { max-width: 1180px; margin: 0 auto; padding: 18px; }
+
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    backdrop-filter: blur(10px);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .brand {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 150px;
+    flex-shrink: 0;
+  }
+
+  .brand h1 {
+    font-size: 16px;
+    color: var(--accent);
+    line-height: 1.1;
+  }
+
+  .brand p {
+    font-size: 11px;
+    color: var(--text2);
+  }
+
+  .search-wrap {
+    position: relative;
+    flex: 1;
+    max-width: 400px;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text2);
+    pointer-events: none;
+  }
+
+  #search {
+    width: 100%;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    padding: 8px 10px 8px 30px;
+    border-radius: 8px;
+    outline: none;
+    font-size: 13px;
+    font-family: monospace;
+  }
+
+  #search:focus { border-color: var(--accent); }
+  #search::placeholder { color: var(--text2); }
+
+  .search-count {
+    font-size: 12px;
+    color: var(--text2);
+    min-width: 80px;
+    flex-shrink: 0;
+  }
+
+  .spacer { flex: 1; }
+
+  .theme-btn {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.15s;
+  }
+
+  .theme-btn:hover {
+    border-color: var(--accent);
+  }
+
+  .tabs {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  .tab {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text2);
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.15s;
+    user-select: none;
+  }
+
+  .tab:hover { color: var(--text); background: var(--surface2); }
+
+  .tab.active {
+    color: white;
+    background: var(--accent);
+    border-color: var(--accent);
+    font-weight: 600;
+  }
+
+  .content { margin-top: 8px; }
+  .pane { display: none; }
+  .pane.active { display: block; }
+
+  #search-results { display: none; }
+  #search-results.active { display: block; }
+
+  .section { margin-bottom: 24px; }
+  .section-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .table thead th {
+    text-align: left;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text2);
+    background: var(--surface2);
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+  }
+
+  .table thead th:first-child { color: var(--accent); }
+  .table thead th:nth-child(2) { color: var(--accent2); }
+
+  .table tbody tr { border-bottom: 1px solid var(--border); transition: background 0.12s; }
+  .table tbody tr:last-child { border-bottom: none; }
+  .table tbody tr:hover { background: var(--row-hover); }
+  .table tbody tr.hidden { display: none; }
+  .table tbody tr.highlighted { background: var(--highlight); }
+
+  .table td {
+    padding: 10px 12px;
+    vertical-align: top;
+    font-size: 12px;
+  }
+
+  .table td:first-child {
+    font-family: monospace;
+    color: var(--text);
+    width: 40%;
+    word-break: break-word;
+  }
+
+  .table td:nth-child(2) {
+    font-family: monospace;
+    color: var(--text2);
+    word-break: break-word;
+  }
+
+  .code {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 11px;
+  }
+
+  .no-results {
+    padding: 24px;
+    text-align: center;
+    color: var(--text2);
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+  }
+
+  mark {
+    background: #ffeb3b;
+    color: #000;
+    border-radius: 2px;
+    padding: 0 1px;
+  }
+
+  .footer {
+    margin-top: 24px;
+    text-align: center;
+    color: var(--text2);
+    font-size: 11px;
+  }
+
+  @media (max-width: 768px) {
+    .header { flex-wrap: wrap; }
+    .search-wrap { flex-basis: 100%; order: 3; }
+    .spacer { display: none; }
+    .tabs { gap: 4px; }
+    .tab { font-size: 11px; padding: 6px 10px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="brand">
+      <h1>py.ref</h1>
+      <p>exceptions</p>
+    </div>
+
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input id="search" type="text" placeholder="search..." autocomplete="off" />
+    </div>
+
+    <div class="search-count" id="search-count"></div>
+    <div class="spacer"></div>
+    <button class="theme-btn" id="theme-btn">🌙 dark</button>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="basics">basics</div>
+    <div class="tab" data-tab="flow">control flow</div>
+    <div class="tab" data-tab="raise">raise & assert</div>
+    <div class="tab" data-tab="custom">custom errors</div>
+    <div class="tab" data-tab="common">common errors</div>
+    <div class="tab" data-tab="js">js → python</div>
+  </div>
+
+  <div class="content">
+    <div id="search-results"></div>
+
+    <!-- BASICS -->
+    <div class="pane active" id="pane-basics">
+      <div class="section">
+        <div class="section-title">basic pattern</div>
+        <table class="table">
+          <thead><tr><th>Python</th><th>when to use</th></tr></thead>
+          <tbody>
+            <tr><td><span class="code">try: ... except SomeError:</span></td><td>when code might fail and you want to recover</td></tr>
+            <tr><td><span class="code">except ValueError:</span></td><td>when converting input like <span class="code">int("abc")</span></td></tr>
+            <tr><td><span class="code">except IndexError:</span></td><td>when list access may go out of range</td></tr>
+            <tr><td><span class="code">except KeyError:</span></td><td>when a dict key may be missing</td></tr>
+            <tr><td><span class="code">except TypeError:</span></td><td>when an operation gets the wrong type</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section">
+        <div class="section-title">multiple exceptions</div>
+        <table class="table">
+          <thead><tr><th>Python</th><th>when to use</th></tr></thead>
+          <tbody>
+            <tr><td><span class="code">except (KeyError, TypeError):</span></td><td>same recovery for related failures</td></tr>
+            <tr><td><span class="code">except (IndexError, KeyError, ValueError):</span></td><td>one fallback for several problems</td></tr>
+            <tr><td><span class="code">except Exception as e:</span></td><td>generic fallback when you want the error message</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CONTROL FLOW -->
+    <div class="pane" id="pane-flow">
+      <div class="section">
+        <div class="section-title">else — runs only if no exception</div>
+        <table class="table">
+          <thead><tr><th>Python</th><th>meaning</th></tr></thead>
+          <tbody>
+            <tr><td>try:<br>  num = int(x)<br>except ValueError:<br>  print("bad")<br>else:<br>  print(num)</td><td>execute success-only logic</td></tr>
+            <tr><td>try:<br>  result = a / b<br>except ZeroDivisionError:<br>  msg = "error"<br>else:<br>  msg = f"ok: {result}"</td><td>keep normal path separate from errors</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section">
+        <div class="section-title">finally — always runs</div>
+        <table class="table">
+          <thead><tr><th>Python</th><th>meaning</th></tr></thead>
+          <tbody>
+            <tr><td>try:<br>  risky()<br>finally:<br>  cleanup()</td><td>guarantee cleanup even after an error</td></tr>
+            <tr><td>try:<br>  f = open("file")<br>...<br>finally:<br>  f.close()</td><td>resource release</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- RAISE & ASSERT -->
+    <div class="pane" id="pane-raise">
+      <div class="section">
+        <div class="section-title">raise — throw an error</div>
+        <table class="table">
+          <thead><tr><th>Python</th><th>when to use</th></tr></thead>
+          <tbody>
+            <tr><td><span class="code">raise ValueError("message")</span></td><td>reject invalid input</td></tr>
+            <tr><td><span class="code">raise TypeError("must be int")</span></td><td>enforce an expected type</td></tr>
+            <tr><td><span class="code">raise</span></td><td>re-raise the current exception</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section">
+        <div class="section-title">assert — check assumptions</div>
+        <table class="table">
+          <thead><tr><th>Python</th><th>when to use</th></tr></thead>
+          <tbody>
+            <tr><td><span class="code">assert x > 0, "x must be positive"</span></td><td>developer assumptions</td></tr>
+            <tr><td><span class="code">assert name, "name cannot be empty"</span></td><td>internal sanity checks</td></tr>
+            <tr><td><span class="code">assert len(items) > 0</span></td><td>check expected non-empty data</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CUSTOM -->
+    <div class="pane" id="pane-custom">
+      <div class="section">
+        <div class="section-title">define custom exception</div>
+        <table class="table">
+          <thead><tr><th>Python</th><th>when to use</th></tr></thead>
+          <tbody>
+            <tr><td><span class="code">class DataValidationError(Exception):<br>  pass</span></td><td>create an app-specific error type</td></tr>
+            <tr><td><span class="code">class UserNotFoundError(Exception):<br>  pass</span></td><td>make intent clearer than built-in errors</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section">
+        <div class="section-title">raise and catch custom exceptions</div>
+        <table class="table">
+          <thead><tr><th>Python</th><th>meaning</th></tr></thead>
+          <tbody>
+            <tr><td><span class="code">raise DataValidationError("Missing id")</span></td><td>signal a validation failure</td></tr>
+            <tr><td><span class="code">except DataValidationError as e:</span></td><td>handle only your app's errors</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- COMMON ERRORS -->
+    <div class="pane" id="pane-common">
+      <div class="section">
+        <div class="section-title">common built-in exceptions</div>
+        <table class="table">
+          <thead><tr><th>Exception</th><th>when it happens</th></tr></thead>
+          <tbody>
+            <tr><td><span class="code">ZeroDivisionError</span></td><td>dividing by zero</td></tr>
+            <tr><td><span class="code">ValueError</span></td><td>right type, wrong value</td></tr>
+            <tr><td><span class="code">TypeError</span></td><td>wrong type for an operation</td></tr>
+            <tr><td><span class="code">IndexError</span></td><td>list index out of range</td></tr>
+            <tr><td><span class="code">KeyError</span></td><td>dictionary key missing</td></tr>
+            <tr><td><span class="code">AttributeError</span></td><td>object has no such attribute</td></tr>
+            <tr><td><span class="code">FileNotFoundError</span></td><td>requested file does not exist</td></tr>
+            <tr><td><span class="code">AssertionError</span></td><td><span class="code">assert</span> failed</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- JS → PYTHON -->
+    <div class="pane" id="pane-js">
+      <div class="section">
+        <div class="section-title">javascript → python</div>
+        <table class="table">
+          <thead><tr><th>JavaScript</th><th>Python</th></tr></thead>
+          <tbody>
+            <tr><td><span class="code">try { } catch (e) { } finally { }</span></td><td><span class="code">try: except: finally:</span></td></tr>
+            <tr><td><span class="code">throw new Error("msg")</span></td><td><span class="code">raise ValueError("msg")</span></td></tr>
+            <tr><td><span class="code">null</span></td><td><span class="code">None</span></td></tr>
+            <tr><td><span class="code">typeof x</span></td><td><span class="code">type(x).__name__</span></td></tr>
+            <tr><td><span class="code">catch (err)</span></td><td><span class="code">except Exception as e</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">use tabs to browse • search to filter • toggle theme</div>
+</div>
+
+<script>
+  const themeBtn = document.getElementById("theme-btn");
+  const searchInput = document.getElementById("search");
+  const searchCount = document.getElementById("search-count");
+  const tabs = Array.from(document.querySelectorAll(".tab"));
+  const panes = Array.from(document.querySelectorAll(".pane"));
+  const searchResults = document.getElementById("search-results");
+
+  let dark = false;
+  let activeTab = "basics";
+  let allRows = null;
+
+  function escapeRegex(str) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function highlightText(html, query) {
+    if (!query) return html;
+    const regex = new RegExp(`(${escapeRegex(query)})`, "gi");
+    return html.replace(regex, "<mark>$1</mark>");
+  }
+
+  function showPane(id) {
+    panes.forEach(p => p.classList.remove("active"));
+    searchResults.style.display = "none";
+    const pane = document.getElementById("pane-" + id);
+    if (pane) pane.classList.add("active");
+  }
+
+  function getAllRows() {
+    const rows = [];
+    panes.forEach(pane => {
+      const tabId = pane.id.replace("pane-", "");
+      const sections = Array.from(pane.querySelectorAll(".section"));
+      sections.forEach(section => {
+        const title = section.querySelector(".section-title")?.textContent || "";
+        const table = section.querySelector(".table");
+        if (table) {
+          table.querySelectorAll("tbody tr").forEach(row => {
+            rows.push({ row, tabId, title });
+          });
+        }
+      });
+    });
+    return rows;
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      tabs.forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      activeTab = tab.dataset.tab;
+      if (!searchInput.value.trim()) {
+        showPane(activeTab);
+      }
+    });
+  });
+
+  themeBtn.addEventListener("click", () => {
+    dark = !dark;
+    document.documentElement.setAttribute("data-theme", dark ? "dark" : "");
+    themeBtn.textContent = dark ? "☀ light" : "🌙 dark";
+  });
+
+  searchInput.addEventListener("input", () => {
+    const q = searchInput.value.trim().toLowerCase();
+
+    if (!q) {
+      searchCount.textContent = "";
+      searchResults.style.display = "none";
+      showPane(activeTab);
+      return;
+    }
+
+    if (!allRows) allRows = getAllRows();
+
+    panes.forEach(p => p.classList.remove("active"));
+    searchResults.style.display = "block";
+
+    const matches = {};
+    let total = 0;
+
+    allRows.forEach(({ row, tabId, title }) => {
+      const text = row.textContent.toLowerCase();
+      if (text.includes(q)) {
+        total++;
+        if (!matches[tabId]) matches[tabId] = {};
+        if (!matches[tabId][title]) matches[tabId][title] = [];
+        matches[tabId][title].push(row);
+      }
+    });
+
+    if (total === 0) {
+      searchCount.textContent = "0 results";
+      searchResults.innerHTML = `<div class="no-results">no results for "${escapeHtml(q)}"</div>`;
+      return;
+    }
+
+    searchCount.textContent = total + (total === 1 ? " result" : " results");
+
+    let html = "";
+    for (const [tabId, sections] of Object.entries(matches)) {
+      const tabName = tabs.find(t => t.dataset.tab === tabId)?.textContent || tabId;
+      html += `<div style="margin-bottom: 20px;"><div class="section-title">${escapeHtml(tabName)}</div>`;
+      for (const [title, rows] of Object.entries(sections)) {
+        if (title) html += `<div style="color: var(--text2); font-size: 11px; margin: 10px 0 8px; text-transform: uppercase; letter-spacing: 0.05em;">${escapeHtml(title)}</div>`;
+        html += `<table class="table"><tbody>`;
+        rows.forEach(row => {
+          const cells = row.querySelectorAll("td");
+          if (cells.length >= 2) {
+            const c1 = highlightText(cells[0].innerHTML, q);
+            const c2 = highlightText(cells[1].innerHTML, q);
+            html += `<tr><td>${c1}</td><td>${c2}</td></tr>`;
+          }
+        });
+        html += `</tbody></table>`;
+      }
+      html += `</div>`;
+    }
+
+    searchResults.innerHTML = html;
+  });
+
+  if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+    dark = true;
+    document.documentElement.setAttribute("data-theme", "dark");
+    themeBtn.textContent = "☀ light";
+  }
+</script>
+</body>
+</html>

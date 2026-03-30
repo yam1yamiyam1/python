@@ -2,6 +2,8 @@ import os
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "data"))
+from collections import Counter, defaultdict
+
 from training_data import numbers, orders, products, students, users
 
 # =============================================================================
@@ -470,7 +472,8 @@ print(
 #   output: Alice
 #           None
 data = {"user": {"profile": {"name": "Alice"}}}
-print(data.get("user").get("profile").get("name"))
+print(data.get("user", {}).get("profile", {}).get("name", "no name"))
+print(data.get("user", {}).get("settings", {}).get("theme", "no theme"))
 
 # 49. Update a nested dict value without mutating the original.
 #     Take users[0], create a deep-ish copy: {**users[0], "stats": {"logins": 0}}
@@ -486,33 +489,67 @@ print(data.get("user").get("profile").get("name"))
 #
 #   output: localhost
 #           6379
-
-
+user1_copy = {**users[0], "stats": {"logins": 0}}
+user1_copy.update({"stats": {"logins": 5}})
+print(user1_copy)
 # 51. Flatten a nested dict one level deep.
 #     nested = {"a": {"x": 1, "y": 2}, "b": {"x": 3, "z": 4}}
 #     Result: {"a_x": 1, "a_y": 2, "b_x": 3, "b_z": 4}
 #
 #   output: {'a_x': 1, 'a_y': 2, 'b_x': 3, 'b_z': 4}
-
-
+nested = {"a": {"x": 1, "y": 2}, "b": {"x": 3, "z": 4}}
+print(
+    {
+        f"{outer}_{inner}": value
+        for outer, inner_dict in nested.items()
+        for inner, value in inner_dict.items()
+    }
+)
 # 52. Build a summary dict for each user:
 #     {name: {"total_spent": x, "order_count": y, "avg_order": z}}
 #
 #   output: {'Alice': {'total_spent': 300, 'order_count': 2, 'avg_order': 150.0}, ...}
-
+print(
+    {
+        u["name"]: {
+            "total_spend": sum(o["total"] for o in orders if o["userId"] == u["id"]),
+            "order_count": sum(1 for o in orders if o["userId"] == u["id"]),
+            "avg_order": (
+                sum(o["total"] for o in orders if o["userId"] == u["id"])
+                / len([o for o in orders if o["userId"] == u["id"]])
+            )
+            if len([o for o in orders if o["userId"] == u["id"]]) > 0
+            else 0,
+        }
+        for u in users
+    }
+)
 
 # 53. Build a product catalog nested dict:
 #     {category: {name: price}} for all products.
 #
 #   output: {'weapon': {'Iron Sword': 120, 'Dragon Bow': 200, 'War Axe': 150},
 #            'armor': {...}, 'potion': {...}}
-
+print(
+    {
+        category: {p["name"]: p["price"] for p in products if p["category"] == category}
+        for category in unique_categories
+    }
+)
 
 # 54. Find the most expensive product per category from the catalog in #53.
 #     {category: (name, price)} for max price in each category.
 #
 #   output: {'weapon': ('Dragon Bow', 200), 'armor': ('Elven Cloak', 95), 'potion': ('Mana Potion', 30)}
-
+print(
+    {
+        category: max(
+            [(p["name"], p["price"]) for p in products if p["category"] == category],
+            key=lambda x=category: x[1],
+        )
+        for category in unique_categories
+    }
+)
 
 # 55. Merge two nested dicts, combining inner dicts (not overwriting).
 #     a = {"x": {"p": 1, "q": 2}, "y": {"p": 3}}
@@ -520,13 +557,23 @@ print(data.get("user").get("profile").get("name"))
 #     result: {"x": {"p": 1, "q": 2, "r": 4}, "y": {"p": 3}, "z": {"p": 5}}
 #
 #   output: {'x': {'p': 1, 'q': 2, 'r': 4}, 'y': {'p': 3}, 'z': {'p': 5}}
-
-
+a = {"x": {"p": 1, "q": 2}, "y": {"p": 3}}
+b = {"x": {"r": 4}, "z": {"p": 5}}
+print({k: a.get(k, {}) | b.get(k, {}) for k in a.keys() | b.keys()})
 # 56. Build a dict of {order_id: {"user_name": ..., "product_name": ..., "total": ...}}
 #     for all orders. Look up names from users and products.
 #
 #   output: {1: {'user_name': 'Alice', 'product_name': 'Iron Sword', 'total': 240}, ...}
-
+product_name_lookup = {p["id"]: p["name"] for p in products}
+order_summary = {
+    o["id"]: {
+        "user_name": username_lookup.get(o["userId"]),
+        "product_name": product_name_lookup.get(o["productId"]),
+        "total": o["total"],
+    }
+    for o in orders
+}
+print(order_summary)
 
 # 57. Given the order summary from #56, find all orders where total > 150.
 #     Print order id + user name + total.
@@ -534,19 +581,41 @@ print(data.get("user").get("profile").get("name"))
 #   output: 1: Alice — $240
 #           4: Carol — $255
 #           ...
-
+for o, v in order_summary.items():
+    print(f"{o}: {v['user_name']} - ${v['total']}")
 
 # 58. Build {user_name: [product_names]} — all products each user has ever ordered.
 #
 #   output: {'Alice': ['Iron Sword', 'Leather Armor'], 'Bob': ['Health Potion', 'Elven Cloak'], ...}
+print(
+    {
+        u["name"]: [
+            product_name_lookup.get(o["productId"])
+            for o in orders
+            if o["userId"] == u["id"]
+        ]
+        for u in users
+    }
+)
 
-
-# 59. Find users who ordered the same product more than once.
-#     Build {user_name: [duplicate_product_names]}.
-#     If none, print "No duplicates".
+# 59. Find users who ordered more than one product (multiple distinct products).
+#     Build {user_name: [product_names_they_ordered]}.
+#     Only include users with 2+ orders.
 #
-#   output: No duplicates  (or a dict if any exist)
-
+#   output: {'Alice': ['Iron Sword', 'Leather Armor'],
+#            'Bob': ['Health Potion', 'Elven Cloak'],
+#            'David': ['War Axe', 'Leather Armor']}
+print(
+    {
+        u["name"]: [
+            product_name_lookup.get(o["productId"])
+            for o in orders
+            if o["userId"] == u["id"]
+        ]
+        for u in users
+        if len([o for o in orders if o["userId"] == u["id"]]) >= 2
+    }
+)
 
 # 60. Build a leaderboard dict sorted by total_spent descending.
 #     {rank: {"name": ..., "total_spent": ...}}
@@ -554,8 +623,17 @@ print(data.get("user").get("profile").get("name"))
 #
 #   output: {1: {'name': 'Bob', 'total_spent': 315},
 #            2: {'name': 'Carol', 'total_spent': 255}, ...}
-
-
+user_totals = [
+    (u["name"], sum(o["total"] for o in orders if o["userId"] == u["id"]))
+    for u in users
+]
+sorted_users = sorted(user_totals, key=lambda x: -x[1])
+print(
+    {
+        rank: {"name": name, "total_spent": total}
+        for rank, (name, total) in enumerate(sorted_users, start=1)
+    }
+)
 # =============================================================================
 # SECTION E — DEFAULTDICT & COUNTER (61–75)
 # =============================================================================
@@ -566,53 +644,75 @@ print(data.get("user").get("profile").get("name"))
 #              d[key].append(value)   ← no need to check if key exists
 #
 #   output: defaultdict(<class 'list'>, {'admin': ['Alice', 'David'], ...})
-
-
+d = defaultdict(list)
+for u in users:
+    role = u["role"]
+    name = u["name"]
+    d[role].append(name)
+print(d)
 # 62. Use defaultdict(int) to count order statuses.
 #     new syn: d = defaultdict(int)
 #              d[key] += 1
 #
 #   output: defaultdict(<class 'int'>, {'completed': 5, 'pending': 3, 'shipped': 2})
-
+d = defaultdict(int)
+for o in orders:
+    d[o["status"]] += 1
+print(d)
 
 # 63. Use defaultdict(set) to map category → set of product names.
 #
 #   output: defaultdict(<class 'set'>, {'weapon': {'Iron Sword', ...}, ...})
-
-
+d = defaultdict(set)
+for p in products:
+    d[p["category"]].add(p["name"])
+print(d)
 # 64. Use defaultdict(list) to build user_id → list of order ids.
 #
 #   output: defaultdict(<class 'list'>, {1: [1, 3], 2: [2, 7], ...})
-
-
+d = defaultdict(list)
+for o in orders:
+    d[o["userId"]].append(o["id"])
+print(d)
 # 65. Use defaultdict(int) to count how many orders each user has made.
 #
 #   output: defaultdict(<class 'int'>, {1: 2, 2: 2, 3: 1, ...})
-
+d = defaultdict(int)
+for o in orders:
+    d[o["userId"]] += 1
+print(d)
 
 # 66. Use Counter to count product categories across all products.
 #     new syn: from collections import Counter
 #              Counter(iterable)
 #
 #   output: Counter({'armor': 3, 'weapon': 3, 'potion': 2})
+category_counts = Counter(p["category"] for p in products)
 
-
+print(category_counts)
 # 67. Use Counter to count order statuses.
 #
 #   output: Counter({'completed': 5, 'pending': 3, 'shipped': 2})
-
+status_counts = Counter(o["status"] for o in orders)
+print(status_counts)
 
 # 68. Use Counter.most_common(n) to get the top 2 most ordered products by order count.
 #     new syn: counter.most_common(n)
 #
 #   output: [(product_id, count), (product_id, count)]
+counts = Counter(o["productId"] for o in orders)
 
+top_products = counts.most_common(2)
+
+print(top_products)
 
 # 69. Use Counter to find which user has placed the most orders.
 #     new syn: counter.most_common(1)[0]
 #
 #   output: ('Alice', 2)  or whichever user has most orders (by name)
-
+counts = Counter(username_lookup.get(o["userId"]) for o in orders)
+top_user = counts.most_common(1)[0]
+print(top_user)
 
 # 70. Combine two Counters using +:
 #     c1 = Counter({"a": 3, "b": 2})
@@ -620,12 +720,14 @@ print(data.get("user").get("profile").get("name"))
 #     new syn: c1 + c2
 #
 #   output: Counter({'c': 4, 'a': 3, 'b': 3})
-
-
+c1 = Counter({"a": 3, "b": 2})
+c2 = Counter({"b": 1, "c": 4})
+print(c1 + c2)
 # 71. Use Counter to count character frequency in "mississippi".
 #
 #   output: Counter({'i': 4, 's': 4, 'p': 2, 'm': 1})
-
+counts = Counter(c for c in "mississippi")
+print(counts)
 
 # 72. Use defaultdict(lambda: "unknown") as a fallback dict.
 #     Build a lookup of id → name for users.
@@ -634,20 +736,28 @@ print(data.get("user").get("profile").get("name"))
 #
 #   output: Alice
 #           unknown
-
-
+user_lookup = defaultdict(lambda: "unknown")
+for u in users:
+    user_lookup[u["id"]] = u["name"]
+print(user_lookup[1])  # Accessing a known ID
+print(user_lookup[99])
 # 73. Use defaultdict(list) to build a multi-level grouping:
 #     {role: {True/False (isActive): [names]}}
 #     Hint: outer defaultdict, inner dict with setdefault.
 #
 #   output: {'admin': {True: ['Alice', 'David']},
 #            'user': {True: ['Frank'], False: ['Bob', 'Eve', 'Hank']}, ...}
-
-
+usernames = defaultdict(dict)
+for u in users:
+    usernames[u["role"]].setdefault(u["isActive"], []).append(u["name"])
+print(dict(usernames))
 # 74. Use Counter to find words that appear more than once in this sentence:
 #     text = "the cat sat on the mat and the cat sat"
 #
 #   output: {'the': 3, 'cat': 2, 'sat': 2}
+text = "the cat sat on the mat and the cat sat"
+words = Counter(text.split())
+print({word: count for word, count in words.items() if count > 1})
 
 
 # 75. Use Counter subtraction to find what's left after removing:
@@ -656,8 +766,9 @@ print(data.get("user").get("profile").get("name"))
 #     new syn:  inventory - sold   ← drops keys that go to 0 or negative
 #
 #   output: Counter({'potion': 3, 'sword': 3, 'shield': 3})
-
-
+inventory = Counter({"sword": 5, "shield": 3, "potion": 8})
+sold = Counter({"sword": 2, "potion": 5, "arrow": 1})
+print(inventory - sold)
 # =============================================================================
 # SECTION F — MIXED CHALLENGES (76–90)
 # =============================================================================
@@ -666,14 +777,25 @@ print(data.get("user").get("profile").get("name"))
 #     the total revenue for that status.
 #
 #   output: {'completed': 695, 'pending': 325, 'shipped': 275}  (approx)
-
+d = defaultdict(int)
+for o in orders:
+    d[o["status"]] += o["total"]
+print(dict(d))
 
 # 77. Build a dict of {user_name: "VIP"} for users who have spent over $200 total.
 #     Users under $200 → "regular".
 #
 #   output: {'Alice': 'VIP', 'Bob': 'VIP', 'Carol': 'VIP', 'David': 'VIP',
 #            'Eve': 'regular', 'Frank': 'regular', 'Grace': 'regular', 'Hank': 'regular'}
-
+d = defaultdict(int)
+for o in orders:
+    d[o["userId"]] += o["total"]
+print(
+    {
+        username_lookup.get(user_id): "VIP" if total > 200 else "regular"
+        for user_id, total in d.items()
+    }
+)
 
 # 78. Given a list of dicts, deduplicate by a key.
 #     Keep the last occurrence of each id.
@@ -681,24 +803,31 @@ print(data.get("user").get("profile").get("name"))
 #     new syn: {r["id"]: r for r in records}
 #
 #   output: {1: {'id': 1, 'val': 'c'}, 2: {'id': 2, 'val': 'b'}}
-
+records = [{"id": 1, "val": "a"}, {"id": 2, "val": "b"}, {"id": 1, "val": "c"}]
+print({r["id"]: r for r in records})
 
 # 79. Build a frequency dict of first letters of all user names.
 #
 #   output: {'A': 1, 'B': 1, 'C': 1, 'D': 1, 'E': 1, 'F': 1, 'G': 1, 'H': 1}
-
+print(dict(Counter(u["name"][0] for u in users)))
 
 # 80. Build a dict of {product_name: total_quantity_ordered} across all orders.
 #
 #   output: {'Iron Sword': 3, 'Health Potion': 9, ...}
-
+d = defaultdict(int)
+for o in orders:
+    d[product_name_lookup.get(o["productId"])] += o["quantity"]
+print(dict(d))
 
 # 81. Find the product that generated the most revenue.
 #     Build {product_name: revenue} then find the max.
 #
 #   output: Health Potion: $225  (or whatever is highest)
-
-
+d = Counter()
+for o in orders:
+    d[product_name_lookup.get(o["productId"])] += o["total"]
+top = d.most_common(1)[0]
+print(f"{top[0]}: ${top[1]}")
 # 82. Build a "report card" dict for each student:
 #     {name: {"grades": [...], "average": x, "highest": x, "lowest": x, "pass": bool}}
 #     pass = average >= 75
