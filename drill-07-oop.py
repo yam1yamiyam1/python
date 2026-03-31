@@ -18,18 +18,39 @@ os.system("cls")
 # ============================================================================
 # Using class: Car
 class Car:
-    def __init__(self, brand, model):
+    car_count = 0
+
+    def __init__(self, brand, model, year, color):
         self.brand = brand
         self.model = model
+        self.color = color
+        self.year = year
+        Car.car_count += 1
+        self.index = Car.car_count
 
     def get_brand(self):
         return self.brand
-    def set_brand
+
+    def set_brand(self, brand):
+        self.brand = brand
+
+    def describe(self):
+        return f"{self.brand} {self.model}"
+
+    def get_specs(self):
+        return f"{self.describe()} {self.year} - {self.color}"
+
+    def __str__(self):
+        return f"{self.year} {self.brand} {self.model}"
+
+    def info(self):
+        return f"Car #{self.index}: {self.brand} {self.model}"
+
 
 # 1. Basic class definition with __init__
 #   Create Car with brand and model attributes
 #   call:   car = Car("Toyota", "Camry")
-car = Car("Toyota", "Camry")
+car = Car("Toyota", "Camry", 2025, "Red")
 # 2. Instance method (simple getter)
 #   Add get_brand() method
 #   call:   car.get_brand()
@@ -39,18 +60,19 @@ print(car.get_brand())
 #   Add set_brand() method
 #   call:   car.set_brand("BMW"); print(car.brand)
 #   output: "BMW"
-
+car.set_brand("BMW")
+print(car.brand)
 # 4. Instance method (behavior)
 #   Add describe() method returning formatted string
 #   call:   car.describe()
 #   output: "Toyota Camry"
-
+print(car.describe())
 # 5. Multiple instance attributes
 #   Extend Car with year, color attributes
 #   Add get_specs() method
 #   call:   car.get_specs()
 #   output: formatted specs string
-
+print(car.get_specs())
 
 # ============================================================================
 # PHASE 2: STRING REPRESENTATION & CLASS VARIABLES (Drills 6-9)
@@ -61,29 +83,46 @@ print(car.get_brand())
 #   Add __str__() returning user-friendly format
 #   call:   print(car)
 #   output: "2020 Toyota Camry"
-
+print(car)
 # 7. Class variable (shared across instances)
 #   Add class variable: car_count = 0
 #   Initialize count in __init__
 #   call:   car1 = Car(...); car2 = Car(...); print(Car.car_count)
 #   output: 2
-
+car1 = Car("Ford", "Mustang", 2023, "Blue")
+car2 = Car("Honda", "Civic", 2024, "Black")
+print(Car.car_count)
 # 8. Accessing instance vs class variables
 #   Add method info() using both self.brand and Car.car_count
 #   call:   car.info()
 #   output: "Car #2: Toyota Camry"
-
+print(car.info())
 # 9. Instance method modifying class variable (pitfall)
 #   Create multiple instances, show car_count increments
 #   call:   c1 = Car(...); c2 = Car(...); c3 = Car(...)
 #           print(Car.car_count)
 #   output: 3
+c1 = Car("BMW", "X5", 2026, "White")
+c2 = Car("Tesla", "Model 3", 2022, "Gray")
+c3 = Car("Nissan", "Altima", 2021, "Silver")
+print(Car.car_count)
 
 
 # ============================================================================
 # PHASE 3: MAGIC METHODS - REPRESENTATION (Drills 10-12)
 # ============================================================================
 # Using class: Person (new)
+class Person:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def __str__(self):
+        return f"{self.name} ({self.age})"
+
+    def __repr__(self):
+        return f"Person{(self.name, self.age)}"
+
 
 # 10. __str__ vs __repr__ (side-by-side comparison)
 #   Add both methods to Person
@@ -92,23 +131,48 @@ print(car.get_brand())
 #   call:   p = Person("Alice", 30); print(str(p)); print(repr(p))
 #   output: Alice (30)
 #            Person('Alice', 30)
+p = Person("Alice", 30)
+print(str(p))
+print(repr(p))
+
 
 # 11. __len__ for len() support
 #   Create NameList class holding list of names
 #   Add __len__() returning count
 #   call:   nl = NameList(["Alice", "Bob", "Charlie"]); len(nl)
 #   output: 3
+class NameList:
+    def __init__(self, names):
+        self.names = names
+
+    def __len__(self):
+        return len(self.names)
+
+    def __repr__(self):
+        return f"NameList({self.names!r})"
+
+
+nl = NameList(["Alice", "Bob", "Charlie"])
+print(len(nl))
 
 # 12. __repr__ for debugging
 #   Add meaningful __repr__() to NameList
 #   call:   nl = NameList([...]); repr(nl)
 #   output: NameList(['Alice', 'Bob', 'Charlie'])
+print(repr(nl))
 
 
 # ============================================================================
 # PHASE 4: INDEXING & CONTAINER OPERATIONS (Drills 13-16)
 # ============================================================================
 # Using class: CustomList (new)
+class CustomList:
+    def __init__(self, list):
+        self.list = list
+
+    def __getitem__(self, key):
+        pass
+
 
 # 13. __getitem__ for indexing
 #   Add __getitem__() to CustomList
