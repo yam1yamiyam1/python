@@ -271,7 +271,8 @@ print(get_first_product_price())
 #
 #   call:   divide_with_else(10, 2)
 #   output: "Result is 5.0"
-
+def divide_with_else(a, b):
+    try a/b
 
 # 12. try/except/else to parse int and confirm success
 #

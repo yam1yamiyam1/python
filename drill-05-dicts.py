@@ -828,6 +828,7 @@ for o in orders:
     d[product_name_lookup.get(o["productId"])] += o["total"]
 top = d.most_common(1)[0]
 print(f"{top[0]}: ${top[1]}")
+
 # 82. Build a "report card" dict for each student:
 #     {name: {"grades": [...], "average": x, "highest": x, "lowest": x, "pass": bool}}
 #     pass = average >= 75
