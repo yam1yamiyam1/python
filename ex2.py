@@ -47,42 +47,48 @@ def main():
     }
     choice = None
 
-    def get_filtered_users(key, value):
-        filtered_users = list(
-            filter(
-                (lambda user: getattr(user, key) == value) if key != 'salary' else (lambda user: getattr(user, key) == value),
-                user_list.values(),
-            )
+    def get_filtered_users_by_role(key, value):
+        return list(
+            filter(lambda user: getattr(user, key) == value, user_list.values())
         )
-        return filtered_users
-    def get_filtered_by 
+
+    def get_filtered_by_salary(min, max):
+        return list(filter(lambda user: min < getattr(user, "salary") < max))
+
     while choice != 0:
         os.system("cls")
         print(
             "=== USER MANAGEMENT SYSTEM ===\n1.  List all users\n2.  Search user by ID\n3.  Filter users by role\n4.  Filter by salary range\n5.  Show statistics\n6.  Add new user\n7.  Update user salary\n8.  Delete user\n9.  Find top earner\n10. Find users by salary bracket\n0.  Exit"
         )
-        choice = int(input("Choose: "))
-        match choice:
-            case 1:
-                print("==================================================")
-                print(f"Total Users = {len(user_list)}")
-                print("==================================================")
-                for user in user_list.values():
-                    print(user)
-            case 2:
-                id_query = int(input("User Id: "))
-                print("==================================================")
-                user_list[id_query].show_info()
-                print("==================================================")
-            case 3:
-                role_query = str(input("Filter Role: "))
-                filtered_users = get_filtered_users("role", role_query)
-                print(f"Found {len(filtered_users)} {role_query}(s):")
-                for user in filtered_users:
-                    print(f"- {user.name}: ${user.salary:,}")
-            case 4:
-                min_salary = float(input('Enter minimum salary: '))
-                max_salary = float(input('Enter maximum salary: '))
+        try:
+            choice = int(input("Choose: "))
+            match choice:
+                case 1:
+                    print("==================================================")
+                    print(f"Total Users = {len(user_list)}")
+                    print("==================================================")
+                    for user in user_list.values():
+                        print(user)
+                case 2:
+                    try:
+                        id_query = int(input("User Id: "))
+                        print("==================================================")
+                        user_list[id_query].show_info()
+                        print("==================================================")
+                    except ValueError:
+                        print("Error: Input invalid")
+                case 3:
+                    role_query = str(input("Filter Role: "))
+                    filtered_users = get_filtered_users_by_role("role", role_query)
+                    print(f"Found {len(filtered_users)} {role_query}(s):")
+                    for user in filtered_users:
+                        print(f"- {user.name}: ${user.salary:,}")
+                case 4:
+                    min_salary = float(input("Enter minimum salary: "))
+                    max_salary = float(input("Enter maximum salary: "))
+                    filtered_users = get_filtered_by_salary(min_salary, max_salary)
+        except ValueError:
+            print("Error: Input invalid")
 
         if choice != 0:
             input("Press any key to continue...")
