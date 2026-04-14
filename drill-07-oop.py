@@ -42,12 +42,16 @@ class Car:
         self.model = model
         self.year = year
         self.color = color
+<<<<<<< Updated upstream
         self.features = []
+=======
+>>>>>>> Stashed changes
         Car.car_count += 1
         self.index = Car.car_count
 
     def get_brand(self):
         return self.brand
+<<<<<<< Updated upstream
 
     def set_brand(self, new_brand):
         self.brand = new_brand
@@ -157,6 +161,51 @@ print(f"Total cars created now: {Car.total_created()}")  # Should be 2
 Car.reset_count()
 print(f"Total cars after reset_count(): {Car.total_created()}")  # Should be 0
 
+=======
+
+    def set_brand(self, brand):
+        self.brand = brand
+
+    def describe(self):
+        return f"{self.brand} {self.model}"
+
+    def get_specs(self):
+        return f"{self.color} {self.year}"
+
+    def __str__(self):
+        return f"{self.year} {self.brand} {self.model}"
+
+    def info(self):
+        return f"Car #{self.index}: {self.brand} {self.model}"
+
+
+# 1. Basic class definition with __init__
+#   Create Car with brand and model attributes
+#   call:   car = Car("Toyota", "Camry")
+car = Car("Toyota", "Camry", "2020", "red")
+# 2. Instance method (simple getter)
+#   Add get_brand() method
+#   call:   car.get_brand()
+#   output: "Toyota"
+print(car.get_brand())
+# 3. Instance method (simple setter)
+#   Add set_brand() method
+#   call:   car.set_brand("BMW"); print(car.brand)
+#   output: "BMW"
+car.set_brand("BMW")
+print(car.brand)
+# 4. Instance method (behavior)
+#   Add describe() method returning formatted string
+#   call:   car.describe()
+#   output: "Toyota Camry"
+print(car.describe())
+# 5. Multiple instance attributes
+#   Extend Car with year, color attributes
+#   Add get_specs() method
+#   call:   car.get_specs()
+#   output: formatted specs string
+print(car.get_specs())
+>>>>>>> Stashed changes
 
 # ============================================================================
 # 2) Person + NameList (EX21-EX26)
@@ -172,6 +221,7 @@ class Person:
         self.name = name
         self.age = age
 
+<<<<<<< Updated upstream
     def __str__(self):
         return f"{self.name} ({self.age})"
 
@@ -283,11 +333,43 @@ print(f"len(cl) == {len(cl)} (Expected: 3)")
 print("\n--- 6. Testing None fallback ---")
 empty_cl = CustomList(None)
 print(f"Empty list length: {len(empty_cl)} (Expected: 0)")
+=======
+# 6. String representation with __str__
+#   Add __str__() returning user-friendly format
+#   call:   print(car)
+#   output: "2020 Toyota Camry"
+print(car)
+# 7. Class variable (shared across instances)
+#   Add class variable: car_count = 0
+#   Initialize count in __init__
+#   call:   car1 = Car(...); car2 = Car(...); print(Car.car_count)
+#   output: 2
+car1 = Car("Chevrolet", "Corvette Z06", "2026", "Habanero")
+car2 = Car("Porsche", "911 Carrera GTS (T-Hybrid)", "2026", "Gentian Blue Metallic")
+print(Car.car_count)
+# 8. Accessing instance vs class variables
+#   Add method info() using both self.brand and Car.car_count
+#   call:   car.info()
+#   output: "Car #2: Toyota Camry"
+print(car.info())
+# 9. Instance method modifying class variable (pitfall)
+#   Create multiple instances, show car_count increments
+#   call:   c1 = Car(...); c2 = Car(...); c3 = Car(...)
+#           print(Car.car_count)
+#   output: 3
+c1 = Car("Ford", "Mustang Dark Horse", "2026", "Orange Fury Metallic")
+print(Car.car_count)
+c2 = Car("Nissan", "Z Heritage Edition", "2026", "Midnight Purple")
+print(Car.car_count)
+c3 = Car("BMW", "M4 Coupe", "2026", "Isle of Man Green")
+print(Car.car_count)
+>>>>>>> Stashed changes
 
 
 # ============================================================================
 # 4) Vector (EX33-EX40)
 # ============================================================================
+<<<<<<< Updated upstream
 # Vector:
 # - Attributes: x:number, y:number
 # - Functions:
@@ -311,6 +393,42 @@ class Vector:
         new_x = self.x - other.x
         new_y = self.y - other.y
         return Vector(new_x, new_y)
+=======
+# Using class: Person (new)
+class Person:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def __repr__(self):
+        return f"Person{(self.name, self.age)}"
+
+    def __str__(self):
+        return f"{self.name} ({self.age})"
+
+
+# 10. __str__ vs __repr__ (side-by-side comparison)
+#   Add both methods to Person
+#   __str__() returns "Alice (30)"
+#   __repr__() returns "Person('Alice', 30)"
+#   call:   p = Person("Alice", 30); print(str(p)); print(repr(p))
+#   output: Alice (30)
+#            Person('Alice', 30)
+p = Person("Alice", 30)
+print(str(p))
+print(repr(p))
+
+
+# 11. __len__ for len() support
+#   Create NameList class holding list of names
+#   Add __len__() returning count
+#   call:   nl = NameList(["Alice", "Bob", "Charlie"]); len(nl)
+#   output: 3
+class NameList:
+    def __init__(self):
+        self.list = []
+
+>>>>>>> Stashed changes
 
     def __mul__(self, scalar):
         new_x = self.x * scalar
