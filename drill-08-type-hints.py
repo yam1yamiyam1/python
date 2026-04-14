@@ -199,50 +199,143 @@ def to_strings(nums: list[int]) -> list[str]:
 
 
 print(to_strings(numbers))
+
+
 # 18. Write a function `average(nums: list[int]) -> float`
 #     that returns the average. Print average(numbers).
+def average(nums: list[int]) -> float:
+    return sum(nums) / len(nums)
+
+
+print(average(numbers))
+
 
 # 19. Write a function `get_names(users: list[dict]) -> list[str]`
 #     that returns all user names. Print it.
+def get_names(users: list[dict]) -> list[str]:
+    return [u["name"] for u in users]
+
+
+print(get_names(users=users))
+
 
 # 20. Write a function `get_active(users: list[dict]) -> list[dict]`
 #     that returns only active users (isActive == True). Print the names.
+def get_active(users: list[dict]) -> list[dict]:
+    return [user for user in users]
+
+
+print(get_active(users=users))
+
 
 # 21. Write a function `prices(products: list[dict]) -> list[float]`
 #     that returns all prices as floats. Print it.
+def prices(products: list[dict]) -> list[float]:
+    return [float(p["price"]) for p in products]
+
+
+print(prices(products=products))
+
 
 # 22. Write a function `count_by_role(users: list[dict]) -> dict[str, int]`
 #     that returns {"admin": 2, "user": 4, "moderator": 2} etc.
 #     Hint: loop and use dict.get(key, 0) + 1.
 #     Print the result.
+def count_by_role(users: list[dict]) -> dict[str, int]:
+    result = {}
+    for u in users:
+        result[u["role"]] = result.get(u["role"], 0) + 1
+    return result
+
+
+print(count_by_role(users=users))
+
 
 # 23. Write a function `index_by_id(users: list[dict]) -> dict[int, dict]`
 #     that returns {1: user_dict, 2: user_dict, ...}.
 #     Print the name of the user with id 3 using the result.
+def index_by_id(users: list[dict]) -> dict[int, dict]:
+    return {u["id"]: u for u in users}
+
+
+print(index_by_id(users=users))
+
 
 # 24. Write a function `totals_by_status(orders: list[dict]) -> dict[str, int]`
 #     that sums order totals grouped by status.
 #     Expected keys: "completed", "pending", "shipped". Print it.
+def totals_by_status(orders: list[dict]) -> dict[str, int]:
+    result = {}
+    for o in orders:
+        result[o["status"]] = result.get(o["status"], 0) + 1
+    return result
+
+
+print(totals_by_status(orders=orders))
+
 
 # 25. Write a function `product_map(products: list[dict]) -> dict[str, float]`
 #     that returns {product_name: price}. Print it.
+def product_map(products: list[dict]) -> dict[str, float]:
+    return {p["name"]: p["price"] for p in products}
+
+
+print(product_map(products=products))
+
 
 # 26. Write a function `max_salary(users: list[dict]) -> int`
 #     that returns the highest salary. Use max() with a key. Print it.
+def max_salary(users: list[dict]) -> int:
+    return max(users, key=lambda x: x["salary"])
+
+
+print(max_salary(users=users))
+
 
 # 27. Write a function `min_price(products: list[dict]) -> float`
 #     that returns the lowest price as float. Print it.
+def min_salary(users: list[dict]) -> int:
+    return min(users, key=lambda x: x["salary"])
+
+
+print(min_salary(users=users))
+
 
 # 28. Write a function `filter_by_role(users: list[dict], role: str) -> list[dict]`
 #     that returns users matching that role. Print names for "admin" and "moderator".
+def filter_by_role(users: list[dict], role: str) -> list[dict]:
+    return [u["name"] for u in users if u["role"] == role]
+
+
+print(filter_by_role(users=users, role="admin"))
+print(filter_by_role(users=users, role="moderator"))
+
 
 # 29. Write a function `sort_by_salary(users: list[dict], reverse: bool = False) -> list[dict]`
 #     that returns users sorted by salary. Print names sorted ascending then descending.
+def sort_by_salary(users: list[dict], reverse: bool = False) -> list[dict]:
+    return list(
+        map(
+            lambda x: x["name"],
+            sorted(users, key=lambda x: x["salary"], reverse=reverse),
+        )
+    )
+
+
+print(sort_by_salary(users=users))
+print(sort_by_salary(users=users, reverse=True))
+
 
 # 30. Write a function `pluck(items: list[dict], key: str) -> list`
 #     that extracts any field from a list of dicts.
 #     Print pluck(users, "name"), pluck(products, "price"), pluck(orders, "status").
+def pluck(items: list[dict], key: str) -> list:
+    return [v[key] for v in items]
 
+
+print(pluck(users, "name"))
+print(pluck(products, "price"))
+print(pluck(orders, "status"))
 
 # =============================================================================
 # SECTION C — OPTIONAL AND UNION HINTS (31–45)
@@ -272,10 +365,29 @@ print(to_strings(numbers))
 # 31. Write `find_user(users: list[dict], id: int) -> Optional[dict]`
 #     that returns the user dict if found, else None.
 #     Print find_user(users, 1) and find_user(users, 99).
+def find_user(users: list[dict], id: int) -> dict | None:
+    for u in users:
+        if u["id"] == id:
+            return u
+    return None
+
+
+print(find_user(users=users, id=1))
+print(find_user(users=users, id=99))
+
 
 # 32. Write `find_product(products: list[dict], name: str) -> dict | None`
 #     that returns the product if found, else None. Use 3.10+ syntax.
 #     Print find_product(products, "War Axe") and find_product(products, "Dagger").
+def find_product(products: list[dict], name: str) -> dict | None:
+    for p in products:
+        if p["name"] == name:
+            return p
+    return None
+
+
+print(find_product(products, "War Axe"))
+print(find_product(products, "Dagger"))
 
 # 33. Write `get_bio(user: dict) -> str | None`
 #     Users don't have a "bio" field. Use dict.get("bio") which returns None if missing.
