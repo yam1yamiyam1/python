@@ -1,8 +1,12 @@
 import os
 import sys
+import time
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "data"))
+from training_data import numbers
+
 os.system("cls")
+
 # =============================================================================
 # DRILL 09 — DECORATORS
 # =============================================================================
@@ -79,7 +83,7 @@ def greet(name):
     return f"hello {name}"
 
 
-print(greet("yuan"))
+print(greet("alice"))
 
 
 # 2. Write a decorator `log_call` that prints "Calling: {function name}"
@@ -88,31 +92,90 @@ print(greet("yuan"))
 #    Apply it to a function `add(a, b)` that returns a + b.
 #    Print add(3, 4).
 def log_call(func):
-    def wrapper(*args):
-        func(*args)
-        print(func.__name__)
+    def wrapper(*args, **kwargs):
+        print(f"Calling: {func.__name__}")
+        result = func(*args, **kwargs)
+        return result
 
     return wrapper
 
 
 @log_call
 def add(a, b):
-    print(a + b)
+    return a + b
 
 
-add(3, 4)
+print(add(3, 4))
+
+
 # 3. Write a decorator `log_result` that prints "Result: {return value}"
 #    AFTER the function runs. Apply it to multiply(a, b) that returns a * b.
 #    Print multiply(5, 6).
+def log_result(func):
+    def wrapper(*args, **kwargs):
+        result = func(*args, **kwargs)
+        print(f"Result: {result}")
+        return result
+
+    return wrapper
+
+
+@log_result
+def multiply(a, b):
+    return a * b
+
+
+multiply(5, 6)
+
 
 # 4. Combine both: write `log` that prints the function name AND the result.
 #    Apply it to `subtract(a, b)`. Print subtract(10, 3).
+
+
+def log(func):
+    def wrapper(*args, **kwargs):
+        print(f"Calling: {func.__name__}")
+        result = func(*args, **kwargs)
+        print(f"Result: {result}")
+        return result
+
+    return wrapper
+
+
+@log
+def subtract(a, b):
+    return a - b
+
+
+subtract(10, 3)
+
 
 # 5. Write a decorator `timer` that prints how long a function takes to run.
 #    Use time.time() before and after. Already imported at the top.
 #    Apply it to a function `slow_sum(nums)` that sums a list with a loop.
 #    Print slow_sum(numbers).
+def timer(func):
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        duration = end_time - start_time
+        print(result)
+        print(f"Execution time for {func.__name__}: {duration:.4f} seconds")
+        return result
 
+    return wrapper
+
+
+@timer
+def slow_sums(nums):
+    total = 0
+    for num in nums:
+        total += num
+    return total
+
+
+slow_sums(nums=numbers)
 # 6. Write a decorator `validate_positive` that raises a ValueError
 #    if the first argument is negative or zero.
 #    Apply it to `square_root(n)` that returns n ** 0.5.
