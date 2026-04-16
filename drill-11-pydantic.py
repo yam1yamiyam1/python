@@ -1,9 +1,8 @@
 import os
 import sys
-import asyncio
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "data"))
-from training_data import numbers, orders, products, students, users
+os.system("cls")
 
 # =============================================================================
 # DRILL 11 — PYDANTIC
@@ -14,7 +13,6 @@ from training_data import numbers, orders, products, students, users
 #              Every drill must print something.
 #              No skipping — do them in order.
 # =============================================================================
-
 # NEW SYNTAX REFERENCE
 # --------------------
 # INSTALL:      pip install pydantic
@@ -79,77 +77,150 @@ from training_data import numbers, orders, products, students, users
 #   class User(BaseModel):
 #       model_config = {"str_strip_whitespace": True}  # strips all str fields
 #       name: str
-
-
 # =============================================================================
 # SECTION A — BASIC MODELS (1–15)
 # =============================================================================
+from pydantic import BaseModel, Field, ValidationError
+from training_data import orders, products, users
 
-from pydantic import BaseModel, Field, field_validator, model_validator
-from typing import Optional
 
 # 1. Define a Pydantic model `UserModel` with fields:
 #    name: str, age: int, role: str, salary: int, isActive: bool
 #    Create an instance from users[0] using UserModel(**users[0]).
 #    Print the instance. Print instance.name and instance.salary.
+class UserModel(BaseModel):
+    name: str = Field(min_length=1, max_length=100)
+    age: int = Field(ge=0, lt=150)
+    role: str = "user"
+    salary: int = Field(ge=0)
+    isActive: bool
+    bio: str | None = None
 
+    @fieldvalidator("name")
+    @classmethod
+    def normalize_name(cls, v: str) -> str:
+        return v.strip().title()
+
+
+instance = UserModel(**users[0])
+print(instance.name)
+print(instance.salary)
 # 2. Create UserModel instances from ALL users using a list comprehension.
 #    Print each one.
-
+user_instances = [UserModel(**u) for u in users]
+for u in user_instances:
+    print(u)
 # 3. Call .model_dump() on users[0] as a UserModel.
 #    Print the result. Confirm it's a plain dict.
 #    Print type(result).
-
+result = instance.model_dump()
+print(result)
 # 4. Call .model_dump_json() on users[0] as a UserModel.
 #    Print the result. Notice it's a JSON string, not a dict.
-
+print(instance.model_dump_json())
 # 5. Use UserModel.model_validate(users[0]) to create an instance.
 #    Print it. This is the same as UserModel(**users[0]) but the FastAPI way.
-
+print(UserModel.model_validate(users[0]))
 # 6. Pydantic coerces types. Try: UserModel(name="Test", age="29", role="user", salary="50000", isActive=1)
 #    Note: age is a string "29", isActive is int 1 — Pydantic converts them.
 #    Print the result and the types of age and isActive.
-
+new_instance = UserModel(name="Test", age="29", role="user", salary="50000", isActive=1)
+print(new_instance)
+print(type(new_instance.age))
+print(type(new_instance.isActive))
 # 7. Pydantic raises ValidationError on bad data.
 #    Try: UserModel(name="Test", age="not_a_number", role="user", salary=0, isActive=True)
 #    Wrap in try/except ValidationError and print the error.
 #    Hint: from pydantic import ValidationError
+# try:
+#     new_instance = UserModel(
+#         name="Test", age="not_a_number", role="user", salary=0, isActive=True
+#     )
+# except ValidationError as e:
+#     print(e)
+try:
+    print(
+        UserModel(name="Test", age="not_a_number", role="user", salary=0, isActive=True)
+    )
+except ValidationError as e:
+    print(e)
+
 
 # 8. Define a model `ProductModel` with:
 #    id: int, name: str, price: float, category: str, inStock: bool, quantity: int
 #    Create instances from ALL products. Print only the available ones (inStock=True).
+class ProductModel(BaseModel):
+    id: int
+    name: str
+    price: float = Field(ge=0)
+    category: str
+    inStock: bool
+    quantity: int = Field(ge=0)
+
+
+instock_product_models = [
+    ProductModel.model_validate(p) for p in products if p["inStock"]
+]
+
 
 # 9. Define a model `OrderModel` with:
 #    id: int, userId: int, productId: int, quantity: int, total: int, status: str
 #    Create all orders. Print orders where status == "completed".
+class OrderModel(BaseModel):
+    id: int
+    userId: int
+    productId: int
+    quantity: int
+    total: int
+    status: str
 
+
+completed_orders = [
+    OrderModel.model_validate(o) for o in orders if o["status"] == "completed"
+]
 # 10. Add a default value to UserModel: role defaults to "user" if not provided.
 #     Test: UserModel(name="Yuan", age=25, salary=40000, isActive=True)
 #     Print the role — should be "user".
-
+test = UserModel(name="Yuan", age=25, salary=40000, isActive=True)
+print(test.role)
 # 11. Add an optional field `bio: str | None = None` to UserModel.
 #     Create one with bio and one without. Print both.
-
+test_a = UserModel(name="Yuan", age=25, salary=40000, isActive=True)
+test_b = UserModel(name="Yuan", age=25, salary=40000, isActive=True, bio="tangina mo")
+print(test_a)
+print(test_b)
 # 12. Access a nested key — add a computed approach:
 #     Create a UserModel from users[0].
 #     Print f"{user.name} is {'active' if user.isActive else 'inactive'}"
+user = UserModel(**users[0])
+print(f"{user.name} is {'active' if {user.isActive} else 'inactive'}")
 
 # 13. model_dump() with include/exclude:
 #     user = UserModel(**users[0])
 #     Print user.model_dump(include={"name", "role"})    # only name and role
 #     Print user.model_dump(exclude={"salary", "id"})    # everything except salary and id
-
+print(user.model_dump(include={"name", "role"}))
+print(user.model_dump(exclude={"salary", "id"}))
 # 14. Convert ALL users to UserModel, then call model_dump() on each,
 #     and collect into a list of dicts. Print it.
 #     This is what FastAPI does when it serializes a response.
-
+print([UserModel(**u).model_dump() for u in users])
 # 15. Create a UserModel list response wrapper:
 #     class UserListResponse(BaseModel):
 #         data: list[UserModel]
 #         total: int
 #     Instantiate it with all users. Print total. Print data[0].name.
+user_list = [UserModel(**u) for u in users]
 
 
+class UserListResponse(BaseModel):
+    data: list[UserModel]
+    total: int
+
+
+response = UserListResponse(data=user_list, total=len(user_list))
+print(response.total)
+print(response.data[0].name)
 # =============================================================================
 # SECTION B — FIELD CONSTRAINTS AND VALIDATORS (16–30)
 # =============================================================================
@@ -159,12 +230,20 @@ from typing import Optional
 #     age: int = Field(ge=0, lt=150)
 #     salary: int = Field(ge=0)
 #     Test with valid data (users[0]). Then test with age=-1 — catch ValidationError.
+# test = UserModel(**{users[0], age:-1})
+try:
+    test = UserModel(**(users[0] | {"age": -1}))
+except ValidationError as e:
+    print(e)
 
 # 17. Add a constraint to ProductModel:
 #     price: float = Field(gt=0)
 #     quantity: int = Field(ge=0)
 #     Test with a product where price=0 — should raise ValidationError.
-
+try:
+    test = ProductModel(**(products[0] | {"price": 0}))
+except ValidationError as e:
+    print(e)
 # 18. Write a field_validator for UserModel that ensures name is title-cased.
 #     (i.e., "alice" becomes "Alice", "ALICE" becomes "Alice")
 #     Syntax:
