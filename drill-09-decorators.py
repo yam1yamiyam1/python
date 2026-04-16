@@ -176,19 +176,80 @@ def slow_sums(nums):
 
 
 slow_sums(nums=numbers)
+
+
 # 6. Write a decorator `validate_positive` that raises a ValueError
 #    if the first argument is negative or zero.
 #    Apply it to `square_root(n)` that returns n ** 0.5.
 #    Print square_root(9). Then try square_root(-4) inside a try/except.
+def validate_positive(fn):
+    def wrapper(*args, **kwargs):
+        if args[0] == 0 or args[0] < 1:
+            raise ValueError("Invalid number to get the root")
+        return fn(*args, **kwargs)
+
+    return wrapper
+
+
+@validate_positive
+def square_root(n):
+    return n**0.5
+
+
+print(square_root(9))
+try:
+    print(square_root(-4))
+except ValueError as e:
+    print(e)
+
 
 # 7. Write a decorator `clamp_result` that clamps the return value between 0 and 100.
 #    Apply it to `scale(n)` that returns n * 10.
 #    Print scale(5) → 50, scale(15) → 100, scale(-3) → 0.
+def clamp_result(fn):
+    def wrapper(*args, **kwargs):
+        n = args[0]
+        if n < 0:
+            return 0
+        result = fn(*args, **kwargs)
+        if result > 100:
+            return 100
+        return result
+
+    return wrapper
+
+
+@clamp_result
+def scale(n):
+    return n * 10
+
+
+print(scale(5))
+print(scale(15))
+print(scale(-3))
+
 
 # 8. Write a decorator `nullable` that returns None if the first argument is None,
 #    otherwise calls the function normally.
 #    Apply it to `get_upper(s)` that returns s.upper().
 #    Print get_upper("hello") and get_upper(None).
+def nullable(fn):
+    def wrapper(*args, **kwargs):
+        if args[0] == None:
+            return None
+        return fn(*args, **kwargs)
+
+    return wrapper
+
+
+@nullable
+def get_upper(s):
+    return s.upper()
+
+
+print(get_upper("hello"))
+print(get_upper(None))
+
 
 # 9. Write a decorator `retry(times)` — a decorator FACTORY — that retries a
 #    function up to `times` times if it raises an Exception, then re-raises.
@@ -205,23 +266,61 @@ slow_sums(nums=numbers)
 #                  raise last
 #              return wrapper
 #          return decorator
-#
+def retry(times):
+    def decorator(fn):
+        def wrapper(*args, **kwargs):
+            for i in range(times):
+                try:
+                    return fn(*args, **kwargs)
+                except Exception as e:
+                    last = e
+            raise last
+
+        return wrapper
+
+    return decorator
+
+
 #    Test it: make a function that fails twice then succeeds using a counter.
-#    counter = {"n": 0}
-#    @retry(3)
-#    def flaky():
-#        counter["n"] += 1
-#        if counter["n"] < 3:
-#            raise ValueError("not yet")
-#        return "ok"
-#    Print flaky().
+counter = {"n": 0}
+
+
+@retry(3)
+def flaky():
+    counter["n"] += 1
+    if counter["n"] < 3:
+        raise ValueError("not yet")
+    return "ok"
+
+
+print(flaky())
+
 
 # 10. Write a decorator `default_on_error` that catches any Exception
 #     and returns a default value instead. Make it accept the default as an arg.
 #     @default_on_error(default=0)
-#     def risky(n):
-#         return 100 // n
+def default_on_error(default):
+    def decorator(fn):
+        def wrapper(*args):
+            try:
+                return fn(*args)
+            except Exception:
+                return default
+
+        return wrapper
+
+    return decorator
+
+
+@default_on_error(default=0)
+def risky(n):
+    return 100 // n
+
+
+print(risky(5))
+print(risky(0))
 #     Print risky(5) → 20, risky(0) → 0.
+
 
 # 11. Write a decorator `count_calls` that tracks how many times a function
 #     has been called. Store the count on the wrapper function itself.
@@ -229,6 +328,26 @@ slow_sums(nums=numbers)
 #     Apply to `ping()` that returns "pong".
 #     Call ping() 5 times. Print ping.calls.
 
+
+def count_calls(fn):
+
+    def wrapper(*args, **kwargs):
+        wrapper.calls += 1
+        return fn(*args, **kwargs)
+
+    wrapper.calls = 0
+
+    return wrapper
+
+
+@count_calls
+def ping():
+    return "pong"
+
+
+for _ in range(4):
+    ping()
+print(ping.calls)
 # 12. Write a decorator `memoize` that caches results so the same inputs
 #     are never computed twice.
 #     Hint: cache = {}  inside the decorator (not wrapper).
