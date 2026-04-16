@@ -32,7 +32,7 @@ class OrderService:
             await asyncio.sleep(1)
             return "SUCCESS"
         except ValidationError:
-            print("ERROR: Invalid Data")
+            return "ERROR: Invalid Data"
 
 
 service = OrderService()
