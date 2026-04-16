@@ -1,4 +1,4 @@
-# 🧰 PROGRESSION SESSION: TOOLBOX & TICKET 1
+# 🧰 PROGRESSION SESSION: TOOLBOX
 
 ## 🧱 THE LEGO BRICKS (Generic Syntax)
 
@@ -66,6 +66,53 @@ class GenericClass:
     async def generic_method(self, data: dict):
         # In the decorator wrapper, args[0] is 'self'!
         pass
+```
+
+### 5. Nested Pydantic Models
+
+```python
+from pydantic import BaseModel
+
+# Define the "inner" data first
+class Address(BaseModel):
+    city: str
+    zip_code: str
+
+# Use the inner class as a type hint in the "outer" data
+class User(BaseModel):
+    username: str
+    address: Address
+
+# It automatically validates nested dictionaries!
+data = {
+    "username": "Yam",
+    "address": {
+        "city": "Tokyo",
+        "zip_code": "100-0001"
+    }
+}
+```
+
+### 6. Decorators with Arguments
+
+```python
+# To pass arguments to a decorator (like @retry(times=3)),
+# you need THREE levels of functions!
+def repeat_decorator(times: int):
+    # Level 1: Receives the decorator arguments
+
+    def decorator(func):
+        # Level 2: Receives the function being wrapped
+
+        async def wrapper(*args, **kwargs):
+            # Level 3: Receives the function's arguments (self, raw_request)
+            for _ in range(times):
+                print("Running...")
+                result = await func(*args, **kwargs)
+            return result
+
+        return wrapper
+    return decorator
 ```
 
 ---
