@@ -41,39 +41,46 @@ async def run_drill_41():
     class Payment(BaseModel):
         amount: float
 
-    def secure_endpoint(path: str, required_role: str):
+    def secure_endpoint(path: str, allowed_roles: list[str]):
         def decorator(func: Callable) -> Callable:
             @wraps(func)
             async def wrapper(*args, **kwargs):
-                if kwargs["role"] != required_role:
+
+                if kwargs.get("role") not in allowed_roles:
                     raise PermissionError("Access Denied")
                 return await func(*args, **kwargs)
 
-            GATEWAY[path] = func
+            GATEWAY[path] = {"func": wrapper, "allowed_roles": allowed_roles}
             return wrapper
 
         return decorator
 
-    @secure_endpoint(path="/refund", required_role="admin")
+    @secure_endpoint(path="/refund", allowed_roles=["admin"])
     async def process_refund(payment: Payment, **kwargs):
         print(f"Refunding ${payment.amount}")
 
     async def dispatch(path: str, raw_payload: dict, role: str):
-        process = GATEWAY[path]
-        print(process.__name__)
+        try:
+            process = GATEWAY[path]["func"]
+            payment_obj = Payment(**raw_payload)
+            await process(payment_obj, role=role)
+        except PermissionError:
+            print("Error: Access Denied")
+        except ValidationError:
+            print("Error: Bad Data")
 
-    await dispatch("/refund", {"amount": 50.50}, role="admin")
+    await dispatch("/refund", {"amount": 50.50}, role=["admin"])
     # --- EXECUTION TESTS (Do not modify these) ---
-    # print(f"Registered Name: {GATEWAY['/refund'].__name__}")
+    print(f"Registered Name: {GATEWAY['/refund']['func'].__name__}")
 
-    # print("\nTest 1: Valid Admin & Valid Data")
-    # await dispatch("/refund", {"amount": 50.50}, role="admin")
+    print("\nTest 1: Valid Admin & Valid Data")
+    await dispatch("/refund", {"amount": 50.50}, role=["admin"])
 
-    # print("\nTest 2: Invalid Role")
-    # await dispatch("/refund", {"amount": 50.50}, role="user")
+    print("\nTest 2: Invalid Role")
+    await dispatch("/refund", {"amount": 50.50}, role=["user"])
 
-    # print("\nTest 3: Invalid Data")
-    # await dispatch("/refund", {"amount": "five dollars"}, role="admin")
+    print("\nTest 3: Invalid Data")
+    await dispatch("/refund", {"amount": "five dollars"}, role=["admin"])
 
     # =========================================================================
     # EXPECTED OUTPUT:
