@@ -97,13 +97,14 @@ async def run_drill_77():
 
     @route("process")
     async def process_incident(incident: Incident):
-        results = await asyncio.gather(
-            log_intake(), run_background_check(), file_report()
-        )
         return {
             "case_id": incident.case_id,
             "suspect": incident.suspect,
-            "logs": [action for action in results],
+            "logs": [
+                await log_intake(),
+                await run_background_check(),
+                await file_report(),
+            ],
             "status": "processed",
         }
 
